@@ -115,6 +115,12 @@ a, h3 {
   margin-right: 30px;
 }
 
+.profile-des {
+  width: 50%;
+  margin: 0 auto 0;
+  text-align: left;
+}
+
 .game-gif {
   float: right;
   margin-right: 30px;
