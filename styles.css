@@ -130,6 +130,14 @@ a, h3 {
   clear: left;
 }
 
+
+.shine-gif {
+  position: relative;
+  bottom: -15px;
+  left: -250px;
+}
+
+
 .game-skill {
   clear: right;
 }
@@ -177,3 +185,4 @@ hr {
 .copyright {
   color: #EAF6F6;
 }
+
