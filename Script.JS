@@ -1,6 +1,6 @@
 /* =========================================================
-   Roshan Dhital — quiz edition
-   Vanilla JS. No dependencies.
+   Roshan Dhital — portfolio motion
+   Vanilla JS. No dependencies. Degrades safely.
    ========================================================= */
 (function () {
   'use strict';
@@ -8,337 +8,256 @@
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var $  = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var lerp = function (a, b, t) { return a + (b - a) * t; };
 
-  /* ---------- year + toast ---------- */
-  var y = $('#year'); if (y) y.textContent = new Date().getFullYear();
+  /* ---------- 1. Loader ---------- */
+  (function loader() {
+    var box = $('#loader'), num = $('#loaderNum'), bar = $('#loaderBar');
+    if (!box) { start(); return; }
 
-  var toastEl = $('#toast'), toastT;
+    if (reduced) { box.classList.add('is-done'); start(); return; }
+
+    document.body.classList.add('is-locked');
+    var t0 = performance.now(), dur = 1900;
+
+    (function tick(now) {
+      var p = Math.min((now - t0) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      if (num) num.textContent = Math.round(eased * 100);
+      if (p < 1) requestAnimationFrame(tick);
+      else {
+        box.classList.add('is-done');
+        document.body.classList.remove('is-locked');
+        start();
+      }
+    })(t0);
+  })();
+
+  /* hero entrance, once the loader clears */
+  function start() {
+    var items = $$('.mask__i');
+    items.forEach(function (n, i) {
+      if (reduced) { n.style.transform = 'none'; return; }
+      setTimeout(function () {
+        n.style.transition = 'transform 1.05s cubic-bezier(.22,.9,.28,1)';
+        n.style.transform = 'translateY(0)';
+      }, 90 * i);
+    });
+
+    $$('.hero [data-anim]').forEach(function (n, i) {
+      setTimeout(function () { n.classList.add('in'); }, 340 + 110 * i);
+    });
+
+    scramble();
+  }
+
+  /* ---------- 2. Scramble text ---------- */
+  function scramble() {
+    var node = $('[data-scramble]');
+    if (!node || reduced) return;
+    var target = node.getAttribute('data-scramble');
+    var chars = '!<>-_\\/[]{}—=+*^?#01';
+    var frame = 0, queue = [];
+
+    for (var i = 0; i < target.length; i++) {
+      queue.push({
+        to: target[i],
+        start: Math.floor(Math.random() * 18),
+        end: Math.floor(Math.random() * 18) + 18
+      });
+    }
+
+    (function run() {
+      var out = '', done = 0;
+      for (var i = 0; i < queue.length; i++) {
+        var q = queue[i];
+        if (frame >= q.end) { done++; out += q.to; }
+        else if (frame >= q.start) out += chars[(Math.random() * chars.length) | 0];
+        else out += ' ';
+      }
+      node.textContent = out;
+      if (done < queue.length) { frame++; requestAnimationFrame(run); }
+      else node.textContent = target;
+    })();
+  }
+
+  /* ---------- 3. Split headings into masked lines ---------- */
+  $$('[data-anim="lines"]').forEach(function (h) {
+    var parts = h.innerHTML.split(/<br\s*\/?>/i);
+    h.innerHTML = parts.map(function (p) {
+      return '<span class="ln"><i>' + p.trim() + '</i></span>';
+    }).join('');
+  });
+
+  /* ---------- 4. Scroll reveals ---------- */
+  var anims = $$('[data-anim]').filter(function (n) { return !n.closest('.hero'); });
+  if (reduced || !('IntersectionObserver' in window)) {
+    anims.forEach(function (n) { n.classList.add('in'); });
+  } else {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var sibs = $$('[data-anim]', e.target.parentNode);
+        var i = Math.max(0, sibs.indexOf(e.target));
+        setTimeout(function () { e.target.classList.add('in'); }, i * 90);
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+    anims.forEach(function (n) { io.observe(n); });
+  }
+
+  /* ---------- 5. Marquee ---------- */
+  (function marquee() {
+    var row = $('#marquee');
+    if (!row) return;
+    var words = ['Incident response', 'Networks', 'Cloud &amp; identity',
+                 'Endpoints', 'Documentation', 'Melbourne'];
+    var block = words.map(function (w) { return '<span>' + w + '<i></i></span>'; }).join('');
+    row.innerHTML = block + block;
+  })();
+
+  /* ---------- 6. Cursor + magnetic ---------- */
+  (function cursor() {
+    var el = $('#cursor');
+    if (!el || reduced) return;
+    if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+
+    var d = $('.cursor__d', el), r = $('.cursor__r', el);
+    var tx = innerWidth / 2, ty = innerHeight / 2;
+    var dx = tx, dy = ty, rx = tx, ry = ty, vx = 0, vy = 0;
+
+    addEventListener('pointermove', function (e) { tx = e.clientX; ty = e.clientY; }, { passive: true });
+
+    (function loop() {
+      dx = lerp(dx, tx, 0.5); dy = lerp(dy, ty, 0.5);
+      vx = (vx + (tx - rx) * 0.13) * 0.74;
+      vy = (vy + (ty - ry) * 0.13) * 0.74;
+      rx += vx; ry += vy;
+      d.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+      r.style.transform = 'translate(' + rx + 'px,' + ry + 'px)';
+      requestAnimationFrame(loop);
+    })();
+
+    $$('a, button').forEach(function (n) {
+      n.addEventListener('pointerenter', function () { el.classList.add('is-big'); });
+      n.addEventListener('pointerleave', function () { el.classList.remove('is-big'); });
+    });
+
+    $$('[data-magnet]').forEach(function (n) {
+      n.addEventListener('pointermove', function (e) {
+        var b = n.getBoundingClientRect();
+        var ox = Math.max(-12, Math.min(12, (e.clientX - (b.left + b.width / 2)) * 0.3));
+        var oy = Math.max(-12, Math.min(12, (e.clientY - (b.top + b.height / 2)) * 0.3));
+        n.style.transform = 'translate(' + ox.toFixed(1) + 'px,' + oy.toFixed(1) + 'px)';
+      });
+      n.addEventListener('pointerleave', function () { n.style.transform = ''; });
+    });
+  })();
+
+  /* ---------- 7. Tile tilt + spotlight ---------- */
+  $$('[data-tilt]').forEach(function (n) {
+    n.addEventListener('pointermove', function (e) {
+      var b = n.getBoundingClientRect();
+      var px = (e.clientX - b.left) / b.width;
+      var py = (e.clientY - b.top) / b.height;
+      n.style.setProperty('--px', (px * 100).toFixed(1) + '%');
+      n.style.setProperty('--py', (py * 100).toFixed(1) + '%');
+      if (reduced) return;
+      n.style.transform = 'perspective(800px) rotateY(' + ((px - .5) * 10).toFixed(2) +
+                          'deg) rotateX(' + ((.5 - py) * 10).toFixed(2) + 'deg) translateY(-4px)';
+    });
+    n.addEventListener('pointerleave', function () { n.style.transform = ''; });
+  });
+
+  /* ---------- 8. Cube reacts to scroll ---------- */
+  (function cube() {
+    var c = $('#cube');
+    if (!c || reduced) return;
+    var ticking = false;
+    addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        var y = scrollY;
+        c.style.animationPlayState = y > innerHeight ? 'paused' : 'running';
+        ticking = false;
+      });
+    }, { passive: true });
+  })();
+
+  /* ---------- 9. Counters ---------- */
+  function count(el) {
+    var target = parseFloat(el.getAttribute('data-count')) || 0;
+    var suf = el.getAttribute('data-suf') || '';
+    var out = el.querySelector('b');
+    if (!out) return;
+    if (reduced) { out.textContent = target + suf; return; }
+    var t0 = performance.now(), dur = 1500;
+    (function tick(now) {
+      var p = Math.min((now - t0) / dur, 1);
+      out.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))) + suf;
+      if (p < 1) requestAnimationFrame(tick);
+    })(t0);
+  }
+  var nums = $$('.num');
+  if ('IntersectionObserver' in window) {
+    var no = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { count(e.target); no.unobserve(e.target); } });
+    }, { threshold: 0.5 });
+    nums.forEach(function (n) { no.observe(n); });
+  } else nums.forEach(count);
+
+  /* ---------- 10. Nav, scrollspy, top button ---------- */
+  var nav = $('#nav'), topBtn = $('#top-btn'), menu = $('#menu');
+  var links = $$('[data-nav]');
+  var secs = links.map(function (a) { return $(a.getAttribute('href')); }).filter(Boolean);
+
+  addEventListener('scroll', function () {
+    var y = scrollY;
+    if (nav) nav.classList.toggle('is-stuck', y > 30);
+    if (topBtn) topBtn.classList.toggle('on', y > 600);
+    var cur = null;
+    secs.forEach(function (s) { if (s.getBoundingClientRect().top <= 160) cur = s.id; });
+    links.forEach(function (a) { a.classList.toggle('on', a.getAttribute('href') === '#' + cur); });
+  }, { passive: true });
+
+  if (menu && nav) {
+    menu.addEventListener('click', function () {
+      var open = nav.classList.toggle('open');
+      menu.setAttribute('aria-expanded', String(open));
+    });
+    links.forEach(function (a) {
+      a.addEventListener('click', function () {
+        nav.classList.remove('open');
+        menu.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  if (topBtn) topBtn.addEventListener('click', function () {
+    scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+  });
+
+  /* ---------- 11. Copy email ---------- */
+  var toastEl = $('#toast'), tT;
   function toast(m) {
     if (!toastEl) return;
     toastEl.textContent = m;
-    toastEl.classList.add('is-up');
-    clearTimeout(toastT);
-    toastT = setTimeout(function () { toastEl.classList.remove('is-up'); }, 2200);
+    toastEl.classList.add('up');
+    clearTimeout(tT);
+    tT = setTimeout(function () { toastEl.classList.remove('up'); }, 2100);
   }
-
-  /* ---------- nav ---------- */
-  var nav = $('#nav'), burger = $('#burger');
-  if (burger && nav) {
-    burger.addEventListener('click', function () {
-      var open = nav.classList.toggle('is-open');
-      burger.setAttribute('aria-expanded', String(open));
-    });
-  }
-  var navLinks = $$('[data-nav]');
-  var secs = navLinks.map(function (a) { return $(a.getAttribute('href')); }).filter(Boolean);
-  window.addEventListener('scroll', function () {
-    var cur = null;
-    secs.forEach(function (s) { if (s.getBoundingClientRect().top <= 160) cur = s.id; });
-    navLinks.forEach(function (a) {
-      a.classList.toggle('is-active', a.getAttribute('href') === '#' + cur);
-    });
-    if (nav) nav.classList.remove('is-open');
-  }, { passive: true });
-
-  /* ---------- ticker ---------- */
-  (function ticker() {
-    var row = $('#tickerRow');
-    if (!row) return;
-    var items = [
-      ['Wi-Fi', 'stands for nothing at all'],
-      ['Bluetooth', 'is named after a Viking king'],
-      ['1956', 'first hard drive: 5MB and a forklift'],
-      ['A coffee pot', 'was the first thing on a webcam'],
-      ['1971', 'email is older than the web'],
-      ['A moth', 'is why we say "bug"'],
-      ['Paper', 'was Nokia\u2019s original business'],
-      ['BackRub', 'was Google\u2019s first name']
-    ];
-    var html = items.map(function (i) {
-      return '<span><b>' + i[0] + '</b> ' + i[1] + '</span>';
-    }).join('');
-    row.innerHTML = html + html;          /* duplicated for seamless loop */
-  })();
-
-  /* ---------- flip cards (click + keyboard) ---------- */
-  $$('[data-flip]').forEach(function (card) {
-    card.setAttribute('aria-pressed', 'false');
-    card.addEventListener('click', function () {
-      var open = card.classList.toggle('is-open');
-      card.setAttribute('aria-pressed', String(open));
-    });
-  });
-
-  /* ---------- 3D tilt on hover ---------- */
-  function tilt(node, max) {
-    if (reduced) return;
-    if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
-    var base = node.dataset.base || '';
-    node.addEventListener('pointermove', function (e) {
-      var r = node.getBoundingClientRect();
-      var px = (e.clientX - r.left) / r.width - 0.5;
-      var py = (e.clientY - r.top) / r.height - 0.5;
-      node.style.transform = base +
-        ' perspective(900px) rotateY(' + (px * max).toFixed(2) + 'deg)' +
-        ' rotateX(' + (-py * max).toFixed(2) + 'deg)';
-    });
-    node.addEventListener('pointerleave', function () { node.style.transform = base; });
-  }
-
-  $$('[data-tilt]').forEach(function (n) { tilt(n, 9); });
-
-  /* hero stack: keep each card's base rotation, add parallax on mouse */
-  (function heroStack() {
-    var stack = $('#stack');
-    if (!stack || reduced) return;
-    var cards = $$('.stack__card', stack);
-    var bases = ['rotate(-8deg) translateZ(0px)', 'rotate(3deg) translateZ(40px)', 'rotate(10deg) translateZ(80px)'];
-
-    stack.addEventListener('pointermove', function (e) {
-      var r = stack.getBoundingClientRect();
-      var px = (e.clientX - r.left) / r.width - 0.5;
-      var py = (e.clientY - r.top) / r.height - 0.5;
-      cards.forEach(function (c, i) {
-        var depth = (i + 1) * 6;
-        c.style.transform = 'translate(-50%,-50%) ' + bases[i] +
-          ' rotateY(' + (px * depth).toFixed(2) + 'deg)' +
-          ' rotateX(' + (-py * depth).toFixed(2) + 'deg)' +
-          ' translate(' + (px * depth * 1.6).toFixed(1) + 'px,' + (py * depth * 1.6).toFixed(1) + 'px)';
-      });
-    });
-    stack.addEventListener('pointerleave', function () {
-      cards.forEach(function (c, i) { c.style.transform = 'translate(-50%,-50%) ' + bases[i]; });
-    });
-  })();
-
-  /* ---------- copy email ---------- */
-  var copyBtn = $('#copyMail');
-  if (copyBtn) copyBtn.addEventListener('click', function () {
-    var m = copyBtn.getAttribute('data-mail') || '';
+  var mail = $('#copyMail');
+  if (mail) mail.addEventListener('click', function () {
+    var v = mail.getAttribute('data-mail') || '';
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(m).then(
-        function () { toast('Copied — go on then'); },
-        function () { toast('Copy failed, select it manually'); }
+      navigator.clipboard.writeText(v).then(
+        function () { toast('Copied to clipboard'); },
+        function () { toast('Copy failed — select it manually'); }
       );
     } else toast('Copy not supported here');
   });
 
-  /* =========================================================
-     QUIZ
-     ========================================================= */
-  var QUESTIONS = [
-    {
-      q: 'The @ symbol was chosen for email addresses because...',
-      opts: [
-        'It means "at" in Latin',
-        'It was sitting unused on the keyboard',
-        'It was the shortest key to reach',
-        'It stood for "address"'
-      ],
-      a: 1,
-      why: 'In 1971 Ray Tomlinson needed a character that would never appear in someone\'s name, so he looked down at his keyboard and picked the one nobody was using. That is genuinely the whole story. It now appears billions of times a day.'
-    },
-    {
-      q: 'Which of these is older?',
-      opts: [
-        'The World Wide Web',
-        'Networked email',
-        'The first iPhone',
-        'The USB port'
-      ],
-      a: 1,
-      why: 'Email came first, in 1971. The web was not proposed until 1989. This trips people up because we treat "the internet" and "the web" as the same thing — the internet is the road network, the web is one very popular type of vehicle on it.'
-    },
-    {
-      q: 'The QWERTY keyboard layout exists because...',
-      opts: [
-        'It is the fastest arrangement for human hands',
-        'It stopped early typewriter arms from jamming',
-        'It was alphabetical originally and got shuffled by mistake',
-        'A committee voted on it'
-      ],
-      a: 1,
-      why: 'On mechanical typewriters, letters typed in quick succession jammed if their arms sat next to each other, so common pairs were spread apart. You often hear it was designed to slow typists down — that is the myth version. We kept it because millions of people had already learned it.'
-    },
-    {
-      q: 'Roughly how much did the first commercial hard drive hold?',
-      opts: [
-        'About 5 megabytes',
-        'About 5 gigabytes',
-        'About 500 megabytes',
-        'About 50 kilobytes'
-      ],
-      a: 0,
-      why: 'IBM\'s 1956 RAMAC stored around 5 MB — roughly one photo from a modern phone. It weighed about a ton and was moved by forklift. Your phone holds tens of thousands of times more and fits in a pocket.'
-    },
-    {
-      q: 'What does the "www" in a web address actually do these days?',
-      opts: [
-        'It is required for the site to work',
-        'It makes the connection faster',
-        'Almost nothing — it is a leftover naming habit',
-        'It marks the site as secure'
-      ],
-      a: 2,
-      why: 'It was originally just a name given to the machine serving web pages, the way you might name a server "mail" or "files". Most sites now work with or without it. It survives mostly out of habit and because people expect to see it.'
-    },
-    {
-      q: 'Your phone battery lasts longest if you...',
-      opts: [
-        'Let it drain to 0% before charging',
-        'Keep it roughly between 20% and 80%',
-        'Charge it only overnight',
-        'Close all your background apps constantly'
-      ],
-      a: 1,
-      why: 'Modern lithium batteries dislike both extremes. Draining to zero is advice left over from older battery chemistry, and constantly force-closing apps can actually use more power, since reopening from scratch costs more than leaving them suspended.'
-    }
-  ];
-
-  var slot = $('#quizSlot'), bar = $('#quizBar'), count = $('#quizCount');
-  var done = $('#quizDone'), scoreEl = $('#quizScore'), verdictEl = $('#quizVerdict');
-  var resetBtn = $('#quizReset');
-
-  var idx = 0, score = 0, answered = false;
-
-  function render() {
-    if (!slot) return;
-    answered = false;
-    var Q = QUESTIONS[idx];
-
-    if (count) count.textContent = 'Question ' + (idx + 1) + ' of ' + QUESTIONS.length;
-    if (bar) bar.style.width = ((idx / QUESTIONS.length) * 100) + '%';
-
-    slot.innerHTML = '';
-
-    var h = document.createElement('p');
-    h.className = 'qz__q';
-    h.textContent = Q.q;
-    slot.appendChild(h);
-
-    if (Q.ctx) {
-      var c = document.createElement('p');
-      c.className = 'qz__ctx';
-      c.textContent = Q.ctx;
-      slot.appendChild(c);
-    }
-
-    var box = document.createElement('div');
-    box.className = 'qz__opts';
-    Q.opts.forEach(function (text, i) {
-      var b = document.createElement('button');
-      b.className = 'opt';
-      b.type = 'button';
-      b.textContent = text;
-      b.addEventListener('click', function () { pick(i, box, Q); });
-      box.appendChild(b);
-    });
-    slot.appendChild(box);
-  }
-
-  function pick(chosen, box, Q) {
-    if (answered) return;
-    answered = true;
-
-    var btns = $$('.opt', box);
-    btns.forEach(function (b, i) {
-      b.disabled = true;
-      if (i === Q.a) b.classList.add('is-right');
-      else if (i === chosen) b.classList.add('is-wrong');
-    });
-
-    if (chosen === Q.a) score++;
-
-    var why = document.createElement('div');
-    why.className = 'qz__why';
-    var strong = document.createElement('b');
-    strong.textContent = chosen === Q.a ? 'Correct.' : 'Not quite.';
-    why.appendChild(strong);
-    why.appendChild(document.createTextNode(Q.why));
-    slot.appendChild(why);
-
-    var next = document.createElement('button');
-    next.className = 'btn btn--pop qz__next';
-    next.type = 'button';
-    next.textContent = idx === QUESTIONS.length - 1 ? 'See my score →' : 'Next question →';
-    next.addEventListener('click', function () {
-      idx++;
-      if (idx >= QUESTIONS.length) finish();
-      else render();
-    });
-    slot.appendChild(next);
-  }
-
-  function finish() {
-    if (bar) bar.style.width = '100%';
-    if (count) count.textContent = 'Done';
-    if (slot) slot.innerHTML = '';
-    if (done) done.hidden = false;
-    if (scoreEl) scoreEl.textContent = score + ' / ' + QUESTIONS.length;
-
-    var msg;
-    if (score === QUESTIONS.length) msg = 'Flawless. You are either in security already or you are lying.';
-    else if (score >= 4) msg = 'Solid. You would survive most inboxes on most days.';
-    else if (score >= 2) msg = 'Middling — which is roughly where most people sit, including some IT departments.';
-    else msg = 'Please do not open any attachments today. Turn on MFA and we will say no more about it.';
-    if (verdictEl) verdictEl.textContent = msg;
-
-    if (score >= 4) confetti();
-  }
-
-  if (resetBtn) resetBtn.addEventListener('click', function () {
-    idx = 0; score = 0;
-    if (done) done.hidden = true;
-    render();
-    var box = $('#quizBox');
-    if (box) box.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
-  });
-
-  if (slot) render();
-
-  /* ---------- confetti ---------- */
-  function confetti() {
-    var cv = $('#confetti');
-    if (!cv || reduced) return;
-    var ctx = cv.getContext('2d');
-    if (!ctx) return;
-
-    var r = cv.getBoundingClientRect();
-    cv.width = r.width; cv.height = r.height;
-
-    var colours = ['#FF4D3D', '#FFC629', '#B6E82E', '#2B59FF', '#7B4DFF'];
-    var bits = [];
-    for (var i = 0; i < 90; i++) {
-      bits.push({
-        x: cv.width / 2, y: cv.height / 2,
-        vx: (Math.random() - 0.5) * 11,
-        vy: (Math.random() - 0.9) * 11,
-        w: 5 + Math.random() * 6, h: 3 + Math.random() * 5,
-        rot: Math.random() * Math.PI,
-        vr: (Math.random() - 0.5) * 0.3,
-        c: colours[(Math.random() * colours.length) | 0],
-        life: 0
-      });
-    }
-
-    (function frame() {
-      ctx.clearRect(0, 0, cv.width, cv.height);
-      var alive = false;
-      bits.forEach(function (b) {
-        b.life++;
-        b.vy += 0.22;
-        b.x += b.vx; b.y += b.vy; b.rot += b.vr;
-        if (b.y < cv.height + 40) alive = true;
-        ctx.save();
-        ctx.translate(b.x, b.y);
-        ctx.rotate(b.rot);
-        ctx.fillStyle = b.c;
-        ctx.globalAlpha = Math.max(0, 1 - b.life / 130);
-        ctx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h);
-        ctx.restore();
-      });
-      if (alive) requestAnimationFrame(frame);
-      else ctx.clearRect(0, 0, cv.width, cv.height);
-    })();
-  }
+  var y = $('#year');
+  if (y) y.textContent = new Date().getFullYear();
 })();
