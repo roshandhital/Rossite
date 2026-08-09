@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not found — Roshan Dhital</title>
+<meta name="theme-color" content="#08080B">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{
+    margin:0;min-height:100svh;display:grid;place-items:center;text-align:center;
+    background:#08080B;color:#F2F0EC;font-family:'JetBrains Mono',monospace;padding:2rem;
+    overflow:hidden;position:relative;
+  }
+  .au{position:fixed;border-radius:50%;filter:blur(90px);opacity:.3;mix-blend-mode:screen}
+  .a1{width:50vw;height:50vw;background:#7C5CFF;top:-12vw;left:-10vw;animation:d1 20s ease-in-out infinite}
+  .a2{width:44vw;height:44vw;background:#FF4D8D;bottom:-14vw;right:-10vw;animation:d2 26s ease-in-out infinite}
+  @keyframes d1{0%,100%{transform:translate(0,0)}50%{transform:translate(6vw,7vh) scale(1.15)}}
+  @keyframes d2{0%,100%{transform:translate(0,0)}50%{transform:translate(-6vw,-5vh) scale(.9)}}
+  .in{position:relative;z-index:1}
+  h1{
+    font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(5rem,22vw,14rem);
+    line-height:.85;letter-spacing:-.05em;margin:0 0 1rem;
+    background:linear-gradient(100deg,#7C5CFF,#FF4D8D 50%,#FFB020);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    background-size:200% auto;animation:sh 6s linear infinite;
+  }
+  @keyframes sh{to{background-position:200% center}}
+  p{color:#8E8B9A;font-size:.9rem;letter-spacing:.05em;margin:0 0 2rem}
+  a{
+    display:inline-block;padding:.9rem 1.8rem;border-radius:100px;
+    background:#F2F0EC;color:#08080B;text-decoration:none;font-size:.85rem;
+    transition:transform .3s cubic-bezier(.22,.9,.28,1)
+  }
+  a:hover{transform:translateY(-3px)}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<i class="au a1"></i><i class="au a2"></i>
+<div class="in">
+  <h1>404</h1>
+  <p>That page doesn't exist.</p>
+  <a href="./">Back to the start</a>
+</div>
+</body>
+</html>
