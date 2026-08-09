@@ -1,677 +1,344 @@
 /* =========================================================
-   Roshan Dhital — portfolio behaviour
-   WebGL fragment shader · GSAP ScrollTrigger · spring physics
-   · SVG morphing · vanilla console
-   Every enhancement degrades safely if its dependency is missing.
+   Roshan Dhital — quiz edition
+   Vanilla JS. No dependencies.
    ========================================================= */
 (function () {
   'use strict';
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var hasGSAP = typeof window.gsap !== 'undefined';
-  var hasST   = hasGSAP && typeof window.ScrollTrigger !== 'undefined';
-
-  document.documentElement.classList.add('js');
-  if (!hasST) document.documentElement.classList.add('no-gsap');
-  if (hasST) gsap.registerPlugin(ScrollTrigger);
-
   var $  = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
-  var lerp = function (a, b, t) { return a + (b - a) * t; };
 
-  /* =======================================================
-     1. WebGL — animated fragment shader field
-     Raw WebGL, no library. Silently removes itself on failure.
-     ======================================================= */
-  (function shaderField() {
-    var canvas = $('#gl');
-    if (!canvas || reduced) return;
-    if (window.innerWidth < 720) return;              // skip on phones
+  /* ---------- year + toast ---------- */
+  var y = $('#year'); if (y) y.textContent = new Date().getFullYear();
 
-    var gl = canvas.getContext('webgl', { antialias: false, alpha: true })
-          || canvas.getContext('experimental-webgl');
-    if (!gl) return;                                   // CSS gradient remains
-
-    var VERT = [
-      'attribute vec2 p;',
-      'void main(){ gl_Position = vec4(p, 0.0, 1.0); }'
-    ].join('\n');
-
-    /* fbm noise field, warped by mouse and time */
-    var FRAG = [
-      'precision mediump float;',
-      'uniform vec2  u_res;',
-      'uniform vec2  u_mouse;',
-      'uniform float u_time;',
-
-      'float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }',
-
-      'float noise(vec2 p){',
-      '  vec2 i = floor(p); vec2 f = fract(p);',
-      '  vec2 u = f * f * (3.0 - 2.0 * f);',
-      '  return mix(mix(hash(i + vec2(0.0,0.0)), hash(i + vec2(1.0,0.0)), u.x),',
-      '             mix(hash(i + vec2(0.0,1.0)), hash(i + vec2(1.0,1.0)), u.x), u.y);',
-      '}',
-
-      'float fbm(vec2 p){',
-      '  float v = 0.0, a = 0.5;',
-      '  for(int i = 0; i < 5; i++){ v += a * noise(p); p *= 2.02; a *= 0.5; }',
-      '  return v;',
-      '}',
-
-      'void main(){',
-      '  vec2 uv = gl_FragCoord.xy / u_res.xy;',
-      '  vec2 asp = vec2(u_res.x / u_res.y, 1.0);',
-      '  vec2 st = uv * asp * 2.4;',
-
-      '  vec2 m = u_mouse * asp * 2.4;',
-      '  float d = distance(st, m);',
-      '  float pull = 0.35 / (1.0 + d * d * 3.0);',   // magnetic warp near cursor
-
-      '  float t = u_time * 0.06;',
-      '  vec2 q = vec2(fbm(st + t), fbm(st + vec2(3.2, 1.7) - t));',
-      '  vec2 r = vec2(fbm(st + 3.0 * q + vec2(1.7, 9.2) + t * 1.4),',
-      '                fbm(st + 3.0 * q + vec2(8.3, 2.8) - t * 1.1));',
-      '  float f = fbm(st + 2.6 * r + pull * 4.0);',
-
-      '  vec3 amber = vec3(0.96, 0.65, 0.14);',
-      '  vec3 cyan  = vec3(0.32, 0.82, 0.77);',
-      '  vec3 deep  = vec3(0.047, 0.071, 0.110);',
-
-      '  vec3 col = mix(deep, cyan,  clamp(f * 1.15, 0.0, 1.0));',
-      '  col = mix(col, amber, clamp(pow(r.x, 2.0) * 1.3 + pull * 0.7, 0.0, 1.0));',
-      '  col += pull * 0.10;',
-
-      '  float vig = smoothstep(1.25, 0.25, length(uv - 0.5));',
-      '  col *= vig;',
-
-      '  gl_FragColor = vec4(col, 0.92);',
-      '}'
-    ].join('\n');
-
-    function compile(type, src) {
-      var s = gl.createShader(type);
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-        console.warn('shader:', gl.getShaderInfoLog(s));
-        return null;
-      }
-      return s;
-    }
-
-    var vs = compile(gl.VERTEX_SHADER, VERT);
-    var fs = compile(gl.FRAGMENT_SHADER, FRAG);
-    if (!vs || !fs) return;
-
-    var prog = gl.createProgram();
-    gl.attachShader(prog, vs);
-    gl.attachShader(prog, fs);
-    gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
-    gl.useProgram(prog);
-
-    var buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
-    var loc = gl.getAttribLocation(prog, 'p');
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-
-    var uRes   = gl.getUniformLocation(prog, 'u_res');
-    var uMouse = gl.getUniformLocation(prog, 'u_mouse');
-    var uTime  = gl.getUniformLocation(prog, 'u_time');
-
-    var mouse = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5 };
-    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    var raf = null, visible = true;
-
-    function size() {
-      var r = canvas.getBoundingClientRect();
-      canvas.width  = Math.max(1, Math.floor(r.width  * dpr));
-      canvas.height = Math.max(1, Math.floor(r.height * dpr));
-      gl.viewport(0, 0, canvas.width, canvas.height);
-    }
-
-    window.addEventListener('pointermove', function (e) {
-      var r = canvas.getBoundingClientRect();
-      mouse.tx = (e.clientX - r.left) / r.width;
-      mouse.ty = 1 - (e.clientY - r.top) / r.height;
-    }, { passive: true });
-
-    function frame(now) {
-      mouse.x = lerp(mouse.x, mouse.tx, 0.06);        // eased follow
-      mouse.y = lerp(mouse.y, mouse.ty, 0.06);
-      gl.uniform2f(uRes, canvas.width, canvas.height);
-      gl.uniform2f(uMouse, mouse.x, mouse.y);
-      gl.uniform1f(uTime, now * 0.001);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-      raf = requestAnimationFrame(frame);
-    }
-
-    size();
-    canvas.classList.add('is-live');
-    raf = requestAnimationFrame(frame);
-
-    var rt;
-    window.addEventListener('resize', function () {
-      clearTimeout(rt); rt = setTimeout(size, 180);
-    });
-
-    /* pause when off-screen or tab hidden — saves battery */
-    function pause() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
-    function play()  { if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame); }
-
-    document.addEventListener('visibilitychange', function () {
-      document.hidden ? pause() : play();
-    });
-
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (es) {
-        visible = es[0].isIntersecting;
-        visible ? play() : pause();
-      }, { threshold: 0.01 }).observe(canvas);
-    }
-  })();
-
-  /* =======================================================
-     2. Flashlight mask over the hero title (CSS mask + JS coords)
-     ======================================================= */
-  (function flashlight() {
-    var title = $('#title');
-    if (!title || reduced) return;
-    var lit = $('.title__lit', title);
-    if (!lit) return;
-
-    var mx = -999, my = -999, cx = -999, cy = -999, running = false;
-
-    title.addEventListener('pointermove', function (e) {
-      var r = title.getBoundingClientRect();
-      mx = e.clientX - r.left; my = e.clientY - r.top;
-      if (!running) { running = true; requestAnimationFrame(tick); }
-    });
-    title.addEventListener('pointerleave', function () { mx = -999; my = -999; });
-
-    function tick() {
-      cx = lerp(cx < -500 ? mx : cx, mx, 0.18);
-      cy = lerp(cy < -500 ? my : cy, my, 0.18);
-      lit.style.setProperty('--mx', cx + 'px');
-      lit.style.setProperty('--my', cy + 'px');
-      requestAnimationFrame(tick);
-    }
-  })();
-
-  /* =======================================================
-     3. Spring-physics cursor + magnetic elements
-     ======================================================= */
-  (function physicsCursor() {
-    var el = $('#cursor');
-    if (!el || reduced) return;
-    if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
-
-    var dot = $('.cursor__dot', el);
-    var ring = $('.cursor__ring', el);
-    var tx = window.innerWidth / 2, ty = window.innerHeight / 2;
-    var dx = tx, dy = ty;                    // dot: stiff spring
-    var rx = tx, ry = ty, vrx = 0, vry = 0;  // ring: real spring w/ damping
-
-    var K = 0.14, DAMP = 0.72;
-
-    window.addEventListener('pointermove', function (e) {
-      tx = e.clientX; ty = e.clientY;
-    }, { passive: true });
-
-    (function loop() {
-      dx = lerp(dx, tx, 0.45);
-      dy = lerp(dy, ty, 0.45);
-
-      vrx = (vrx + (tx - rx) * K) * DAMP;
-      vry = (vry + (ty - ry) * K) * DAMP;
-      rx += vrx; ry += vry;
-
-      dot.style.transform  = 'translate(' + dx + 'px,' + dy + 'px)';
-      ring.style.transform = 'translate(' + rx + 'px,' + ry + 'px)';
-      requestAnimationFrame(loop);
-    })();
-
-    $$('a, button, input').forEach(function (n) {
-      n.addEventListener('pointerenter', function () { el.classList.add('is-hot'); });
-      n.addEventListener('pointerleave', function () { el.classList.remove('is-hot'); });
-    });
-
-    /* magnetic pull — GSAP quickTo when present, manual spring otherwise */
-    $$('[data-magnet]').forEach(function (node) {
-      var strength = 0.32, max = 14;
-      var qx = hasGSAP ? gsap.quickTo(node, 'x', { duration: 0.5, ease: 'elastic.out(1,0.4)' }) : null;
-      var qy = hasGSAP ? gsap.quickTo(node, 'y', { duration: 0.5, ease: 'elastic.out(1,0.4)' }) : null;
-
-      node.addEventListener('pointermove', function (e) {
-        var r = node.getBoundingClientRect();
-        var ox = (e.clientX - (r.left + r.width / 2)) * strength;
-        var oy = (e.clientY - (r.top + r.height / 2)) * strength;
-        ox = Math.max(-max, Math.min(max, ox));
-        oy = Math.max(-max, Math.min(max, oy));
-        if (qx) { qx(ox); qy(oy); }
-        else node.style.transform = 'translate(' + ox + 'px,' + oy + 'px)';
-      });
-
-      node.addEventListener('pointerleave', function () {
-        if (qx) { qx(0); qy(0); }
-        else node.style.transform = '';
-      });
-    });
-  })();
-
-  /* =======================================================
-     4. SVG blob — continuous morph via generated path
-     ======================================================= */
-  (function morphBlob() {
-    var path = $('#blobPath');
-    if (!path) return;
-
-    var N = 8, R = 108, CX = 150, CY = 150;
-    var seeds = [];
-    for (var i = 0; i < N; i++) {
-      seeds.push({ a: Math.random() * Math.PI * 2, s: 0.5 + Math.random() * 0.7 });
-    }
-
-    function build(t) {
-      var pts = [];
-      for (var i = 0; i < N; i++) {
-        var ang = (i / N) * Math.PI * 2;
-        var wob = Math.sin(t * seeds[i].s + seeds[i].a) * 17;
-        var rad = R + wob;
-        pts.push([CX + Math.cos(ang) * rad, CY + Math.sin(ang) * rad]);
-      }
-      /* closed quadratic through midpoints — smooth at every joint */
-      var d = '';
-      for (var j = 0; j < N; j++) {
-        var p0 = pts[j];
-        var p1 = pts[(j + 1) % N];
-        var p2 = pts[(j + 2) % N];
-        if (j === 0) {
-          var sx = (p0[0] + p1[0]) / 2, sy = (p0[1] + p1[1]) / 2;
-          d = 'M' + sx.toFixed(1) + ',' + sy.toFixed(1);
-        }
-        var nx = (p1[0] + p2[0]) / 2, ny = (p1[1] + p2[1]) / 2;
-        d += ' Q' + p1[0].toFixed(1) + ',' + p1[1].toFixed(1) +
-             ' ' + nx.toFixed(1) + ',' + ny.toFixed(1);
-      }
-      return d + ' Z';
-    }
-
-    if (reduced) { path.setAttribute('d', build(0)); return; }
-
-    var t0 = performance.now();
-    (function spin(now) {
-      path.setAttribute('d', build((now - t0) * 0.0006));
-      requestAnimationFrame(spin);
-    })(t0);
-  })();
-
-  /* =======================================================
-     5. GSAP — scroll-linked reveals, split headings, pinned track
-     ======================================================= */
-  if (hasST && !reduced) {
-
-    /* headings split into characters, staggered on entry */
-    $$('[data-split]').forEach(function (h) {
-      var text = h.textContent;
-      h.textContent = '';
-      var frag = document.createDocumentFragment();
-      text.split('').forEach(function (ch) {
-        var s = document.createElement('span');
-        s.className = 'ch';
-        s.textContent = ch === ' ' ? '\u00A0' : ch;
-        frag.appendChild(s);
-      });
-      h.appendChild(frag);
-
-      gsap.from(h.querySelectorAll('.ch'), {
-        scrollTrigger: { trigger: h, start: 'top 85%' },
-        yPercent: 110, opacity: 0, duration: 0.7,
-        ease: 'power3.out', stagger: 0.022
-      });
-    });
-
-    gsap.utils.toArray('[data-fade]').forEach(function (n) {
-      gsap.to(n, {
-        scrollTrigger: { trigger: n, start: 'top 90%' },
-        opacity: 1, y: 0, duration: 0.8, ease: 'power2.out',
-        startAt: { opacity: 0, y: 22 }
-      });
-    });
-
-    gsap.utils.toArray('.tl').forEach(function (n) {
-      gsap.to(n, {
-        scrollTrigger: { trigger: n, start: 'top 85%' },
-        opacity: 1, y: 0, duration: 0.8, ease: 'power2.out',
-        startAt: { opacity: 0, y: 26 }
-      });
-    });
-
-    /* hero parallax on scroll */
-    gsap.to('.hero__inner', {
-      scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.5 },
-      y: 90, opacity: 0.25, ease: 'none'
-    });
-
-    /* pinned horizontal scrollytelling */
-    var track = $('#track');
-    var stage = $('#pinStage');
-    var bar = $('#pinBar');
-    if (track && stage) {
-      var distance = function () { return Math.max(0, track.scrollWidth - window.innerWidth + 80); };
-      gsap.to(track, {
-        x: function () { return -distance(); },
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '#process',
-          start: 'top top',
-          end: function () { return '+=' + (distance() + window.innerHeight * 0.6); },
-          pin: stage,
-          scrub: 0.6,
-          invalidateOnRefresh: true,
-          onUpdate: function (self) {
-            if (bar) bar.style.width = (self.progress * 100).toFixed(1) + '%';
-          }
-        }
-      });
-    }
-  } else {
-    /* no GSAP (or reduced motion): make sure nothing stays invisible */
-    $$('[data-fade], .tl').forEach(function (n) { n.style.opacity = 1; });
+  var toastEl = $('#toast'), toastT;
+  function toast(m) {
+    if (!toastEl) return;
+    toastEl.textContent = m;
+    toastEl.classList.add('is-up');
+    clearTimeout(toastT);
+    toastT = setTimeout(function () { toastEl.classList.remove('is-up'); }, 2200);
   }
 
-  /* =======================================================
-     6. Nav, scrollspy, back-to-top, toast
-     ======================================================= */
-  var nav = $('#nav'), toTop = $('#toTop');
+  /* ---------- nav ---------- */
+  var nav = $('#nav'), burger = $('#burger');
+  if (burger && nav) {
+    burger.addEventListener('click', function () {
+      var open = nav.classList.toggle('is-open');
+      burger.setAttribute('aria-expanded', String(open));
+    });
+  }
   var navLinks = $$('[data-nav]');
-  var sections = navLinks.map(function (a) { return $(a.getAttribute('href')); }).filter(Boolean);
-
-  function onScroll() {
-    var y = window.scrollY;
-    if (nav) nav.classList.toggle('is-stuck', y > 20);
-    if (toTop) toTop.classList.toggle('is-on', y > 700);
+  var secs = navLinks.map(function (a) { return $(a.getAttribute('href')); }).filter(Boolean);
+  window.addEventListener('scroll', function () {
     var cur = null;
-    sections.forEach(function (s) { if (s.getBoundingClientRect().top <= 140) cur = s.id; });
+    secs.forEach(function (s) { if (s.getBoundingClientRect().top <= 160) cur = s.id; });
     navLinks.forEach(function (a) {
       a.classList.toggle('is-active', a.getAttribute('href') === '#' + cur);
     });
-  }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+    if (nav) nav.classList.remove('is-open');
+  }, { passive: true });
 
-  if (toTop) toTop.addEventListener('click', function () {
-    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
-  });
+  /* ---------- ticker ---------- */
+  (function ticker() {
+    var row = $('#tickerRow');
+    if (!row) return;
+    var items = [
+      ['Wi-Fi', 'stands for nothing at all'],
+      ['Bluetooth', 'is named after a Viking king'],
+      ['1956', 'first hard drive: 5MB and a forklift'],
+      ['A coffee pot', 'was the first thing on a webcam'],
+      ['1971', 'email is older than the web'],
+      ['A moth', 'is why we say "bug"'],
+      ['Paper', 'was Nokia\u2019s original business'],
+      ['BackRub', 'was Google\u2019s first name']
+    ];
+    var html = items.map(function (i) {
+      return '<span><b>' + i[0] + '</b> ' + i[1] + '</span>';
+    }).join('');
+    row.innerHTML = html + html;          /* duplicated for seamless loop */
+  })();
 
-  var navToggle = $('#navToggle');
-  if (navToggle && nav) {
-    navToggle.addEventListener('click', function () {
-      var open = nav.classList.toggle('is-open');
-      navToggle.setAttribute('aria-expanded', String(open));
-    });
-    navLinks.forEach(function (a) {
-      a.addEventListener('click', function () {
-        nav.classList.remove('is-open');
-        navToggle.setAttribute('aria-expanded', 'false');
-      });
-    });
-  }
-
-  var yearEl = $('#year');
-  if (yearEl) yearEl.textContent = new Date().getFullYear();
-
-  var toastEl = $('#toast'), toastTimer;
-  function toast(msg) {
-    if (!toastEl) return;
-    toastEl.textContent = msg;
-    toastEl.classList.add('is-up');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { toastEl.classList.remove('is-up'); }, 2200);
-  }
-
-  /* =======================================================
-     7. Counters
-     ======================================================= */
-  function countUp(el) {
-    var target = parseFloat(el.getAttribute('data-count')) || 0;
-    var suffix = el.getAttribute('data-suffix') || '';
-    var out = $('.stat__num', el);
-    if (!out) return;
-    if (reduced) { out.textContent = target + suffix; return; }
-    var start = performance.now(), dur = 1300;
-    (function tick(now) {
-      var p = Math.min((now - start) / dur, 1);
-      out.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))) + suffix;
-      if (p < 1) requestAnimationFrame(tick);
-    })(start);
-  }
-  var stats = $$('.stat');
-  if ('IntersectionObserver' in window) {
-    var so = new IntersectionObserver(function (es) {
-      es.forEach(function (e) { if (e.isIntersecting) { countUp(e.target); so.unobserve(e.target); } });
-    }, { threshold: 0.4 });
-    stats.forEach(function (s) { so.observe(s); });
-  } else stats.forEach(countUp);
-
-  /* =======================================================
-     8. Capability filters
-     ======================================================= */
-  var filters = $$('.filter'), cards = $$('#skillGrid .card'), gridEmpty = $('#gridEmpty');
-  filters.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var want = btn.getAttribute('data-filter'), shown = 0;
-      filters.forEach(function (b) { b.classList.toggle('is-on', b === btn); });
-      cards.forEach(function (c) {
-        var ok = want === 'all' || c.getAttribute('data-cat') === want;
-        c.classList.toggle('is-hidden', !ok);
-        if (ok) shown++;
-      });
-      if (gridEmpty) gridEmpty.hidden = shown !== 0;
-      if (hasGSAP && !reduced) {
-        gsap.fromTo(cards.filter(function (c) { return !c.classList.contains('is-hidden'); }),
-          { opacity: 0, y: 14 },
-          { opacity: 1, y: 0, duration: 0.45, stagger: 0.03, ease: 'power2.out' });
-      }
-      if (hasST) ScrollTrigger.refresh();
+  /* ---------- flip cards (click + keyboard) ---------- */
+  $$('[data-flip]').forEach(function (card) {
+    card.setAttribute('aria-pressed', 'false');
+    card.addEventListener('click', function () {
+      var open = card.classList.toggle('is-open');
+      card.setAttribute('aria-pressed', String(open));
     });
   });
 
-  /* =======================================================
-     9. Copy email
-     ======================================================= */
+  /* ---------- 3D tilt on hover ---------- */
+  function tilt(node, max) {
+    if (reduced) return;
+    if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+    var base = node.dataset.base || '';
+    node.addEventListener('pointermove', function (e) {
+      var r = node.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width - 0.5;
+      var py = (e.clientY - r.top) / r.height - 0.5;
+      node.style.transform = base +
+        ' perspective(900px) rotateY(' + (px * max).toFixed(2) + 'deg)' +
+        ' rotateX(' + (-py * max).toFixed(2) + 'deg)';
+    });
+    node.addEventListener('pointerleave', function () { node.style.transform = base; });
+  }
+
+  $$('[data-tilt]').forEach(function (n) { tilt(n, 9); });
+
+  /* hero stack: keep each card's base rotation, add parallax on mouse */
+  (function heroStack() {
+    var stack = $('#stack');
+    if (!stack || reduced) return;
+    var cards = $$('.stack__card', stack);
+    var bases = ['rotate(-8deg) translateZ(0px)', 'rotate(3deg) translateZ(40px)', 'rotate(10deg) translateZ(80px)'];
+
+    stack.addEventListener('pointermove', function (e) {
+      var r = stack.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width - 0.5;
+      var py = (e.clientY - r.top) / r.height - 0.5;
+      cards.forEach(function (c, i) {
+        var depth = (i + 1) * 6;
+        c.style.transform = 'translate(-50%,-50%) ' + bases[i] +
+          ' rotateY(' + (px * depth).toFixed(2) + 'deg)' +
+          ' rotateX(' + (-py * depth).toFixed(2) + 'deg)' +
+          ' translate(' + (px * depth * 1.6).toFixed(1) + 'px,' + (py * depth * 1.6).toFixed(1) + 'px)';
+      });
+    });
+    stack.addEventListener('pointerleave', function () {
+      cards.forEach(function (c, i) { c.style.transform = 'translate(-50%,-50%) ' + bases[i]; });
+    });
+  })();
+
+  /* ---------- copy email ---------- */
   var copyBtn = $('#copyMail');
   if (copyBtn) copyBtn.addEventListener('click', function () {
-    var mail = copyBtn.getAttribute('data-mail') || '';
+    var m = copyBtn.getAttribute('data-mail') || '';
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(mail).then(
-        function () { toast('Email address copied'); },
-        function () { toast('Copy failed — select the text instead'); }
+      navigator.clipboard.writeText(m).then(
+        function () { toast('Copied — go on then'); },
+        function () { toast('Copy failed, select it manually'); }
       );
-    } else toast('Copy is unavailable in this browser');
+    } else toast('Copy not supported here');
   });
 
-  /* =======================================================
-     10. Triage console
-     ======================================================= */
-  var body = $('#termBody'), input = $('#termInput'), clock = $('#termClock');
-
-  if (clock) setInterval(function () {
-    clock.textContent = new Date().toLocaleTimeString('en-AU', { hour12: false });
-  }, 1000);
-
-  var HELP = [
-    ['whoami', 'who I am and what I do'],
-    ['skills', 'tools I use in production'],
-    ['experience', 'roles and dates'],
-    ['education', 'degree and study'],
-    ['projects', 'things I have built'],
-    ['scan', 'run a mock triage sweep'],
-    ['contact', 'how to reach me'],
-    ['uptime', 'how long I have been at this'],
-    ['clear', 'wipe the console'],
-    ['help', 'show this list']
+  /* =========================================================
+     QUIZ
+     ========================================================= */
+  var QUESTIONS = [
+    {
+      q: 'The @ symbol was chosen for email addresses because...',
+      opts: [
+        'It means "at" in Latin',
+        'It was sitting unused on the keyboard',
+        'It was the shortest key to reach',
+        'It stood for "address"'
+      ],
+      a: 1,
+      why: 'In 1971 Ray Tomlinson needed a character that would never appear in someone\'s name, so he looked down at his keyboard and picked the one nobody was using. That is genuinely the whole story. It now appears billions of times a day.'
+    },
+    {
+      q: 'Which of these is older?',
+      opts: [
+        'The World Wide Web',
+        'Networked email',
+        'The first iPhone',
+        'The USB port'
+      ],
+      a: 1,
+      why: 'Email came first, in 1971. The web was not proposed until 1989. This trips people up because we treat "the internet" and "the web" as the same thing — the internet is the road network, the web is one very popular type of vehicle on it.'
+    },
+    {
+      q: 'The QWERTY keyboard layout exists because...',
+      opts: [
+        'It is the fastest arrangement for human hands',
+        'It stopped early typewriter arms from jamming',
+        'It was alphabetical originally and got shuffled by mistake',
+        'A committee voted on it'
+      ],
+      a: 1,
+      why: 'On mechanical typewriters, letters typed in quick succession jammed if their arms sat next to each other, so common pairs were spread apart. You often hear it was designed to slow typists down — that is the myth version. We kept it because millions of people had already learned it.'
+    },
+    {
+      q: 'Roughly how much did the first commercial hard drive hold?',
+      opts: [
+        'About 5 megabytes',
+        'About 5 gigabytes',
+        'About 500 megabytes',
+        'About 50 kilobytes'
+      ],
+      a: 0,
+      why: 'IBM\'s 1956 RAMAC stored around 5 MB — roughly one photo from a modern phone. It weighed about a ton and was moved by forklift. Your phone holds tens of thousands of times more and fits in a pocket.'
+    },
+    {
+      q: 'What does the "www" in a web address actually do these days?',
+      opts: [
+        'It is required for the site to work',
+        'It makes the connection faster',
+        'Almost nothing — it is a leftover naming habit',
+        'It marks the site as secure'
+      ],
+      a: 2,
+      why: 'It was originally just a name given to the machine serving web pages, the way you might name a server "mail" or "files". Most sites now work with or without it. It survives mostly out of habit and because people expect to see it.'
+    },
+    {
+      q: 'Your phone battery lasts longest if you...',
+      opts: [
+        'Let it drain to 0% before charging',
+        'Keep it roughly between 20% and 80%',
+        'Charge it only overnight',
+        'Close all your background apps constantly'
+      ],
+      a: 1,
+      why: 'Modern lithium batteries dislike both extremes. Draining to zero is advice left over from older battery chemistry, and constantly force-closing apps can actually use more power, since reopening from scratch costs more than leaving them suspended.'
+    }
   ];
 
-  var RESPONSES = {
-    whoami: [
-      'Roshan Dhital',
-      'IT Operations Analyst — Crown Melbourne',
-      'Melbourne, Victoria, Australia',
-      '',
-      'Level 2 incident response across gaming, hospitality and corporate',
-      'systems. Firewall and web filtering review, endpoint access control,',
-      'network troubleshooting.'
-    ],
-    skills: [
-      'SECURITY & NETWORK',
-      '  Check Point SmartConsole, Forcepoint, Aruba ClearPass,',
-      '  SecureCRT, Cisco Call Manager',
-      '',
-      'CLOUD & IDENTITY',
-      '  Microsoft Azure, Active Directory, Intune, AVD,',
-      '  Workspace ONE, Exchange Admin Center',
-      '',
-      'OPERATIONS',
-      '  ServiceNow, Confluence, Ninja RMM, Auvik',
-      '',
-      'CODE',
-      '  Python, JavaScript, HTML/CSS, Git'
-    ],
-    experience: [
-      '2023-11 → now     IT Operations Analyst     Crown Melbourne',
-      '2023-05 → 2023-10 IT Support Intern         ATMC',
-      '2019-11 → 2022-10 BIT                       Federation University'
-    ],
-    education: [
-      'Bachelor of Information Technology',
-      'Federation University Australia — 2019 to 2022',
-      '',
-      'Networking and information security, cloud computing,',
-      'systems analysis, web development, OOP.'
-    ],
-    projects: [
-      'Barcode-scanning retail prototype (university, 2022)',
-      '  InVision, HTML, CSS, JavaScript, Python, MySQL.',
-      '  Judged best of seven prototypes in the cohort.',
-      '',
-      'This site',
-      '  WebGL fragment shader, GSAP ScrollTrigger, CSS scroll-driven',
-      '  animations and hand-written SVG morphing.'
-    ],
-    contact: [
-      'email     Rsondhtl.50@gmail.com',
-      'linkedin  linkedin.com/in/roshan-dhital',
-      'location  Melbourne, VIC',
-      '',
-      'Open to cybersecurity and security operations roles.'
-    ],
-    uptime: function () {
-      var start = new Date(2023, 4, 1);
-      var days = Math.floor((Date.now() - start) / 86400000);
-      return ['In IT operations for ' + days + ' days.'];
-    }
-  };
+  var slot = $('#quizSlot'), bar = $('#quizBar'), count = $('#quizCount');
+  var done = $('#quizDone'), scoreEl = $('#quizScore'), verdictEl = $('#quizVerdict');
+  var resetBtn = $('#quizReset');
 
-  function line(text, cls) {
-    if (!body) return null;
-    var p = document.createElement('p');
-    p.className = 'ln ' + (cls || 'ln--out');
-    p.textContent = text;
-    body.appendChild(p);
-    body.scrollTop = body.scrollHeight;
-    return p;
-  }
-  function echo(lines) { lines.forEach(function (t) { line(t); }); }
+  var idx = 0, score = 0, answered = false;
 
-  function printHelp() {
-    line('Available commands:', 'ln--key');
-    HELP.forEach(function (pair) {
-      var pad = pair[0] + '             '.slice(0, Math.max(1, 13 - pair[0].length));
-      line('  ' + pad + pair[1]);
-    });
-  }
+  function render() {
+    if (!slot) return;
+    answered = false;
+    var Q = QUESTIONS[idx];
 
-  function runScan() {
-    var steps = [
-      ['Starting triage sweep...', 'ln--key'],
-      ['  [ok]   queue reachable', 'ln--out'],
-      ['  [ok]   17 open incidents', 'ln--out'],
-      ['  [warn] 3 awaiting vendor response', 'ln--warn'],
-      ['  [ok]   0 breached SLAs', 'ln--out'],
-      ['  [ok]   documentation current', 'ln--out'],
-      ['Sweep complete.', 'ln--key']
-    ];
-    if (reduced) { steps.forEach(function (s) { line(s[0], s[1]); }); return; }
-    var i = 0;
-    (function next() {
-      if (i >= steps.length) return;
-      line(steps[i][0], steps[i][1]); i++;
-      setTimeout(next, 260);
-    })();
-  }
+    if (count) count.textContent = 'Question ' + (idx + 1) + ' of ' + QUESTIONS.length;
+    if (bar) bar.style.width = ((idx / QUESTIONS.length) * 100) + '%';
 
-  var history = [], histIdx = -1;
+    slot.innerHTML = '';
 
-  function run(raw) {
-    var cmd = String(raw || '').trim().toLowerCase();
-    if (!cmd) return;
+    var h = document.createElement('p');
+    h.className = 'qz__q';
+    h.textContent = Q.q;
+    slot.appendChild(h);
 
-    var p = line('', 'ln--cmd');
-    if (p) {
-      var b = document.createElement('b');
-      b.textContent = '› ';
-      p.appendChild(b);
-      p.appendChild(document.createTextNode(cmd));
+    if (Q.ctx) {
+      var c = document.createElement('p');
+      c.className = 'qz__ctx';
+      c.textContent = Q.ctx;
+      slot.appendChild(c);
     }
 
-    history.push(cmd); histIdx = history.length;
-
-    if (cmd === 'clear') { body.innerHTML = ''; return; }
-    if (cmd === 'help')  { printHelp(); return; }
-    if (cmd === 'scan')  { runScan(); return; }
-    if (cmd === 'sudo' || cmd.indexOf('sudo ') === 0) { line('Permission denied.', 'ln--warn'); return; }
-
-    var res = RESPONSES[cmd];
-    if (typeof res === 'function') { echo(res()); return; }
-    if (res) { echo(res); return; }
-
-    line('Unknown command: ' + cmd, 'ln--warn');
-    line('Type help for the list.');
+    var box = document.createElement('div');
+    box.className = 'qz__opts';
+    Q.opts.forEach(function (text, i) {
+      var b = document.createElement('button');
+      b.className = 'opt';
+      b.type = 'button';
+      b.textContent = text;
+      b.addEventListener('click', function () { pick(i, box, Q); });
+      box.appendChild(b);
+    });
+    slot.appendChild(box);
   }
 
-  if (input && body) {
-    input.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') {
-        run(input.value); input.value = ''; line('', 'ln--sp');
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        if (histIdx > 0) { histIdx--; input.value = history[histIdx] || ''; }
-      } else if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        if (histIdx < history.length - 1) { histIdx++; input.value = history[histIdx] || ''; }
-        else { histIdx = history.length; input.value = ''; }
-      }
+  function pick(chosen, box, Q) {
+    if (answered) return;
+    answered = true;
+
+    var btns = $$('.opt', box);
+    btns.forEach(function (b, i) {
+      b.disabled = true;
+      if (i === Q.a) b.classList.add('is-right');
+      else if (i === chosen) b.classList.add('is-wrong');
     });
 
-    $$('.chip').forEach(function (c) {
-      c.addEventListener('click', function () {
-        run(c.getAttribute('data-cmd')); line('', 'ln--sp'); input.focus();
+    if (chosen === Q.a) score++;
+
+    var why = document.createElement('div');
+    why.className = 'qz__why';
+    var strong = document.createElement('b');
+    strong.textContent = chosen === Q.a ? 'Correct.' : 'Not quite.';
+    why.appendChild(strong);
+    why.appendChild(document.createTextNode(Q.why));
+    slot.appendChild(why);
+
+    var next = document.createElement('button');
+    next.className = 'btn btn--pop qz__next';
+    next.type = 'button';
+    next.textContent = idx === QUESTIONS.length - 1 ? 'See my score →' : 'Next question →';
+    next.addEventListener('click', function () {
+      idx++;
+      if (idx >= QUESTIONS.length) finish();
+      else render();
+    });
+    slot.appendChild(next);
+  }
+
+  function finish() {
+    if (bar) bar.style.width = '100%';
+    if (count) count.textContent = 'Done';
+    if (slot) slot.innerHTML = '';
+    if (done) done.hidden = false;
+    if (scoreEl) scoreEl.textContent = score + ' / ' + QUESTIONS.length;
+
+    var msg;
+    if (score === QUESTIONS.length) msg = 'Flawless. You are either in security already or you are lying.';
+    else if (score >= 4) msg = 'Solid. You would survive most inboxes on most days.';
+    else if (score >= 2) msg = 'Middling — which is roughly where most people sit, including some IT departments.';
+    else msg = 'Please do not open any attachments today. Turn on MFA and we will say no more about it.';
+    if (verdictEl) verdictEl.textContent = msg;
+
+    if (score >= 4) confetti();
+  }
+
+  if (resetBtn) resetBtn.addEventListener('click', function () {
+    idx = 0; score = 0;
+    if (done) done.hidden = true;
+    render();
+    var box = $('#quizBox');
+    if (box) box.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+  });
+
+  if (slot) render();
+
+  /* ---------- confetti ---------- */
+  function confetti() {
+    var cv = $('#confetti');
+    if (!cv || reduced) return;
+    var ctx = cv.getContext('2d');
+    if (!ctx) return;
+
+    var r = cv.getBoundingClientRect();
+    cv.width = r.width; cv.height = r.height;
+
+    var colours = ['#FF4D3D', '#FFC629', '#B6E82E', '#2B59FF', '#7B4DFF'];
+    var bits = [];
+    for (var i = 0; i < 90; i++) {
+      bits.push({
+        x: cv.width / 2, y: cv.height / 2,
+        vx: (Math.random() - 0.5) * 11,
+        vy: (Math.random() - 0.9) * 11,
+        w: 5 + Math.random() * 6, h: 3 + Math.random() * 5,
+        rot: Math.random() * Math.PI,
+        vr: (Math.random() - 0.5) * 0.3,
+        c: colours[(Math.random() * colours.length) | 0],
+        life: 0
       });
-    });
+    }
 
-    var termBox = $('#term');
-    if (termBox) termBox.addEventListener('click', function (e) {
-      if (e.target.tagName !== 'INPUT') input.focus();
-    });
-
-    line('Roshan Dhital — triage console', 'ln--key');
-    line('Melbourne, Australia');
-    line('');
-    line('Type help for commands, or click one below.');
-    line('', 'ln--sp');
+    (function frame() {
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      var alive = false;
+      bits.forEach(function (b) {
+        b.life++;
+        b.vy += 0.22;
+        b.x += b.vx; b.y += b.vy; b.rot += b.vr;
+        if (b.y < cv.height + 40) alive = true;
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.rotate(b.rot);
+        ctx.fillStyle = b.c;
+        ctx.globalAlpha = Math.max(0, 1 - b.life / 130);
+        ctx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h);
+        ctx.restore();
+      });
+      if (alive) requestAnimationFrame(frame);
+      else ctx.clearRect(0, 0, cv.width, cv.height);
+    })();
   }
 })();
