@@ -10,9 +10,9 @@
   --fg:      #F2F0EC;
   --dim:     #8E8B9A;
 
-  --violet:  #7C5CFF;
-  --pink:    #FF4D8D;
-  --amber:   #FFB020;
+  --violet:  #4C7DFF;
+  --pink:    #22D3EE;
+  --amber:   #7DF2B0;
   --mint:    #4EE0B5;
 
   --display: 'Syne', system-ui, sans-serif;
@@ -123,15 +123,18 @@ button{ font:inherit; color:inherit; background:none; border:0; }
 
 .cursor{ display:none; }
 @media (hover:hover) and (pointer:fine){
-  .cursor{ position:fixed; top:0; left:0; z-index:300; pointer-events:none; mix-blend-mode:difference; }
+  .cursor{ position:fixed; top:0; left:0; z-index:300; pointer-events:none; }
   .cursor__d,.cursor__r{ position:absolute; top:0; left:0; border-radius:50%; transform:translate(-50%,-50%); }
-  .cursor__d{ width:6px; height:6px; background:#fff; }
+  .cursor__d{ display:none; }              /* native pointer does this job */
   .cursor__r{
-    width:34px; height:34px; border:1px solid rgba(255,255,255,.65);
-    transition:width .3s var(--ease), height .3s var(--ease), background .3s;
+    width:38px; height:38px; border:1px solid rgba(126,242,176,.55);
+    box-shadow:0 0 18px rgba(76,125,255,.35);
+    transition:width .3s var(--ease), height .3s var(--ease), background .3s, border-color .3s;
   }
-  .cursor.is-big .cursor__r{ width:64px; height:64px; background:rgba(255,255,255,.08); }
-  html.js body, html.js a, html.js button{ cursor:none; }
+  .cursor.is-big .cursor__r{
+    width:66px; height:66px;
+    background:rgba(76,125,255,.10); border-color:rgba(34,211,238,.75);
+  }
 }
 
 /* =========================================================
@@ -198,10 +201,10 @@ button{ font:inherit; color:inherit; background:none; border:0; }
 
 .hero__h1{
   font-family:var(--display); font-weight:800;
-  font-size:clamp(3rem,10vw,7.5rem); line-height:.9;
-  letter-spacing:-.04em; margin:0 0 1.5rem;
+  font-size:clamp(2.5rem,7.6vw,6rem); line-height:.95;
+  letter-spacing:-.035em; margin:0 0 1.5rem;
 }
-.mask{ display:block; overflow:hidden; }
+.mask{ display:block; overflow:hidden; padding:0 .12em; margin-left:-.12em; }
 .js .mask__i{ display:block; transform:translateY(105%); }
 .mask__i{ display:block; }
 .grad{
@@ -238,7 +241,7 @@ button{ font:inherit; color:inherit; background:none; border:0; }
 .scene{ position:relative; display:grid; place-items:center; height:340px; perspective:1000px; }
 .scene__glow{
   position:absolute; width:220px; height:220px; border-radius:50%;
-  background:radial-gradient(circle,rgba(124,92,255,.45),transparent 68%);
+  background:radial-gradient(circle,rgba(76,125,255,.45),transparent 68%);
   filter:blur(28px);
 }
 .cube{
@@ -254,8 +257,8 @@ button{ font:inherit; color:inherit; background:none; border:0; }
   position:absolute; inset:0; display:grid; place-items:center;
   font-family:var(--mono); font-size:.72rem; letter-spacing:.2em;
   color:var(--fg);
-  border:1px solid rgba(124,92,255,.55);
-  background:rgba(124,92,255,.07); backdrop-filter:blur(3px);
+  border:1px solid rgba(76,125,255,.55);
+  background:rgba(76,125,255,.07); backdrop-filter:blur(3px);
 }
 .f-front { transform:translateZ(75px); }
 .f-back  { transform:rotateY(180deg) translateZ(75px); }
@@ -347,7 +350,7 @@ button{ font:inherit; color:inherit; background:none; border:0; }
 }
 .job::before{
   content:''; position:absolute; inset:0 -2rem; border-radius:14px;
-  background:linear-gradient(100deg,rgba(124,92,255,.10),rgba(255,77,141,.06));
+  background:linear-gradient(100deg,rgba(76,125,255,.10),rgba(34,211,238,.06));
   opacity:0; transition:opacity .4s var(--ease); z-index:-1;
 }
 .job:hover::before{ opacity:1; }
@@ -369,10 +372,10 @@ button{ font:inherit; color:inherit; background:none; border:0; }
 }
 .tile::after{
   content:''; position:absolute; inset:0;
-  background:radial-gradient(400px circle at var(--px,50%) var(--py,50%),rgba(124,92,255,.16),transparent 42%);
+  background:radial-gradient(400px circle at var(--px,50%) var(--py,50%),rgba(76,125,255,.16),transparent 42%);
   opacity:0; transition:opacity .35s;
 }
-.tile:hover{ border-color:rgba(124,92,255,.5); }
+.tile:hover{ border-color:rgba(76,125,255,.5); }
 .tile:hover::after{ opacity:1; }
 .tile__i{ display:block; font-size:1.5rem; color:var(--violet); margin-bottom:1rem; }
 .tile h3{ font-family:var(--display); font-weight:700; font-size:1.15rem; margin:0 0 .5rem; }
@@ -385,7 +388,7 @@ button{ font:inherit; color:inherit; background:none; border:0; }
   background:rgba(13,13,18,.7); will-change:transform;
   transition:border-color .3s, background .3s;
 }
-.mail:hover{ border-color:var(--violet); background:rgba(124,92,255,.08); }
+.mail:hover{ border-color:var(--violet); background:rgba(76,125,255,.08); }
 .mail span{ display:block; font-family:var(--mono); font-size:clamp(.9rem,3vw,1.15rem); word-break:break-all; }
 .mail i{ display:block; margin-top:.35rem; font-family:var(--mono); font-style:normal; font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); }
 
