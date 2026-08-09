@@ -10,8 +10,27 @@
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
   var lerp = function (a, b, t) { return a + (b - a) * t; };
 
+  /* Run a block in isolation. One broken feature must never take the page
+     down with it — a failure here should cost an animation, not the content. */
+  function safe(name, fn) {
+    try { fn(); }
+    catch (err) { console.warn('[site] ' + name + ' failed:', err); reveal(); }
+  }
+
+  /* Last resort: make every hidden element visible. */
+  function reveal() {
+    $$('[data-anim]').forEach(function (n) { n.classList.add('in'); });
+    $$('.mask__i').forEach(function (n) { n.style.transform = 'none'; });
+    var l = $('#loader');
+    if (l) l.classList.add('is-done');
+    document.body.classList.remove('is-locked');
+  }
+
+  /* Failsafe timer: whatever happens, nothing stays invisible past 4 seconds. */
+  setTimeout(reveal, 4000);
+
   /* ---------- 1. Loader ---------- */
-  (function loader() {
+  safe('loader', function () {
     var box = $('#loader'), num = $('#loaderNum'), bar = $('#loaderBar');
     if (!box) { start(); return; }
 
@@ -31,7 +50,7 @@
         start();
       }
     })(t0);
-  })();
+  });
 
   /* hero entrance, once the loader clears */
   function start() {
@@ -78,18 +97,21 @@
       node.textContent = out;
       if (done < queue.length) { frame++; requestAnimationFrame(run); }
       else node.textContent = target;
-    })();
+    });
   }
 
   /* ---------- 3. Split headings into masked lines ---------- */
+  safe('split', function () {
   $$('[data-anim="lines"]').forEach(function (h) {
     var parts = h.innerHTML.split(/<br\s*\/?>/i);
     h.innerHTML = parts.map(function (p) {
       return '<span class="ln"><i>' + p.trim() + '</i></span>';
     }).join('');
   });
+  });
 
   /* ---------- 4. Scroll reveals ---------- */
+  safe('reveals', function () {
   var anims = $$('[data-anim]').filter(function (n) { return !n.closest('.hero'); });
   if (reduced || !('IntersectionObserver' in window)) {
     anims.forEach(function (n) { n.classList.add('in'); });
@@ -105,19 +127,20 @@
     }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
     anims.forEach(function (n) { io.observe(n); });
   }
+  });
 
   /* ---------- 5. Marquee ---------- */
-  (function marquee() {
+  safe('marquee', function () {
     var row = $('#marquee');
     if (!row) return;
     var words = ['Incident response', 'Networks', 'Cloud &amp; identity',
                  'Endpoints', 'Documentation', 'Melbourne'];
     var block = words.map(function (w) { return '<span>' + w + '<i></i></span>'; }).join('');
     row.innerHTML = block + block;
-  })();
+  });
 
   /* ---------- 6. Cursor + magnetic ---------- */
-  (function cursor() {
+  safe('cursor', function () {
     var el = $('#cursor');
     if (!el || reduced) return;
     if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
@@ -136,7 +159,7 @@
       d.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
       r.style.transform = 'translate(' + rx + 'px,' + ry + 'px)';
       requestAnimationFrame(loop);
-    })();
+    });
 
     $$('a, button').forEach(function (n) {
       n.addEventListener('pointerenter', function () { el.classList.add('is-big'); });
@@ -152,7 +175,7 @@
       });
       n.addEventListener('pointerleave', function () { n.style.transform = ''; });
     });
-  })();
+  });
 
   /* ---------- 7. Tile tilt + spotlight ---------- */
   $$('[data-tilt]').forEach(function (n) {
@@ -170,7 +193,7 @@
   });
 
   /* ---------- 8. Cube reacts to scroll ---------- */
-  (function cube() {
+  safe('cube', function () {
     var c = $('#cube');
     if (!c || reduced) return;
     var ticking = false;
@@ -183,7 +206,7 @@
         ticking = false;
       });
     }, { passive: true });
-  })();
+  });
 
   /* ---------- 9. Counters ---------- */
   function count(el) {
