@@ -1,67 +1,387 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>Roshan Dhital</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="favicon.ico">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roshan Dhital — IT Operations Analyst, Melbourne</title>
+<meta name="description" content="Roshan Dhital is an IT Operations Analyst in Melbourne working in incident response, network security and access control.">
+<meta name="author" content="Roshan Dhital">
+
+<meta property="og:title" content="Roshan Dhital — IT Operations Analyst">
+<meta property="og:description" content="Level 2 incident response, network security and access control. Melbourne, Australia.">
+<meta property="og:type" content="website">
+
+<link rel="icon" href="favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital@1&family=Montserrat&family=Sacramento&display=swap" rel="stylesheet">
-  </head>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
 
-  <body>
-    <div class="top-container">
-      <img class = "cloud1" src="bird.gif" width = 50px height=30px alt="cloud-img">
-      <h1>I'm Roshan</h1>
-      <h2><span class="pro"> Pro</span>grammer and IT Operations Analyst</h2>
-      <img class="cloud2" src="cloud2.gif" width= 600px alt="roshan photo">
-      <img class= "snowing" src="snowing.gif" width=600px height=400px alt="snowing-gif">
-      <img class= "mountain" src="mountainrange.png" width=1445px height= 400px alt="mountain-img">
-      <img class= "skiing"src="skiing.gif" alt="skiing">
-    </div>
-    <div class="middle-container">
-      <div class="profile">
-        <img src="alltimefav.png" height=300px width=300px alt="roshan photo">
-        <h2>Hello.</h2>
-        <p class = "profile-des">An IT professional with a Bachelor's degree and a strong background in programming and IT Support. Have an INTJ personality type, characterized by strategic thinking and learning obsession.</p>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" id="nav">
+  <a class="nav__mark" href="#top">
+    <span class="nav__dot" aria-hidden="true"></span>
+    RD
+  </a>
+  <nav aria-label="Sections">
+    <ul class="nav__list">
+      <li><a href="#about" data-nav>About</a></li>
+      <li><a href="#console" data-nav>Console</a></li>
+      <li><a href="#work" data-nav>Experience</a></li>
+      <li><a href="#skills" data-nav>Capabilities</a></li>
+      <li><a href="#contact" data-nav>Contact</a></li>
+    </ul>
+  </nav>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="nav">
+    <span class="sr-only">Open menu</span>
+    <span class="nav__bars" aria-hidden="true"></span>
+  </button>
+</header>
+
+<main id="main">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="top">
+    <canvas class="hero__canvas" id="net" aria-hidden="true"></canvas>
+
+    <div class="hero__inner">
+      <p class="eyebrow">
+        <span class="pulse" aria-hidden="true"></span>
+        Melbourne, Australia
+      </p>
+
+      <h1 class="hero__title">
+        Roshan<br><span class="hero__title--alt">Dhital</span>
+      </h1>
+
+      <p class="hero__role">
+        IT Operations Analyst<span class="sep">/</span>Level&nbsp;2 Incident Response
+      </p>
+
+      <p class="hero__lede">
+        Two years supporting enterprise operations across gaming, hospitality
+        and corporate environments. Focused on incident investigation, network
+        security and access control.
+      </p>
+
+      <div class="hero__actions">
+        <a class="btn btn--solid" href="#console">Open the console</a>
+        <a class="btn btn--ghost" href="#contact">Get in touch</a>
       </div>
-      <hr>
-      <div class="skills">
-        <h2>My Skills and Work Experience</h2>
-        <div class="skill-row">
-          <img class="code-gif" src="code.gif" height=200px width=200px alt="">
-          <h3>Design and Development</h3>
-          <p class="code-skill">My major skills are Python Programming, IT Operations Analysis, Web Design and Development.</p>
+
+      <dl class="facts">
+        <div class="facts__item">
+          <dt>Current</dt>
+          <dd>Crown Melbourne</dd>
         </div>
-        <div class="skill-row">
-          <img class="game-gif" src="ITsupport.webp" height=200px width=270px alt="IT Support gif">
-          <h3>IT Support Intern</h3>
-          <p class= "game-skill" style = "position: relative; left : 130px;">Intern at <a href = "https://atmc.edu.au"><strong>ATMC</strong></a> from May 2023 till Oct 2023.</p>
+        <div class="facts__item">
+          <dt>Focus</dt>
+          <dd>Security &amp; networks</dd>
         </div>
-        <div class="skill-row">
-          <h3 style = "position: relative; left : 240px;">IT Operations Analyst</h3>
-          <img class="code-gif" src="crownlogo.png" height=250px width=250px style="overflow: hidden; border-radius: 30px;" alt="Crown Logo">
-          <img class="shine-gif" src="shine giphy.webp" height=200px width=200px alt="shining">
-         <br>
-          <br>
-          <br>
-          <p class="code-skill" style = "position: relative; left : 150px;">Been with <a href = "https://www.crownmelbourne.com.au/"><strong>Crown</strong></a> since Nov 2021.</p>
+        <div class="facts__item">
+          <dt>Degree</dt>
+          <dd>BIT, Federation Uni</dd>
         </div>
-      </div>
-      <hr> 
-      <div class="contact-me">
-        <h2>Get In Touch</h2>
-        <p>Please feel free to reach out to me via email: <emphasis>rsondhtl.50@gmail.com</emphasis> for any queries.</p>
-        <a class="btn" href="mailto:name@email.com">CONTACT ME</a>
-      </div>
+      </dl>
     </div>
 
-    <div class="bottom-container">
-      <a class="footer-link" href="https://www.linkedin.com/in/roshan-dhital/">LinkedIn</a>
-      <a class="footer-link" href="https://twitter.com/">Twitter</a>
-      <a class="footer-link" href="https://www.facebook.com/rsondhtl.50">Facebook</a>
-      <p class="copyright">© 2023 Roshan Dhital @Rossite<br>  <br> Last updated on Jan 2024.</p>
+    <div class="hero__scroll" aria-hidden="true">
+      <span></span>
     </div>
-  </body>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="section" id="about">
+    <div class="wrap">
+      <p class="label">01 — Background</p>
+      <h2 class="h2">About</h2>
+
+      <div class="about">
+        <div class="about__body">
+          <p>
+            I work as an IT Operations Analyst at Crown Melbourne, handling
+            Level 2 incidents across gaming, hospitality and corporate systems
+            in a 24/7 environment. Much of the work sits close to security:
+            firewall and web filtering review, endpoint access control, and
+            network troubleshooting across multiple sites.
+          </p>
+          <p>
+            Before Crown I interned at Australian Technical and Management
+            College, and I hold a Bachelor of Information Technology from
+            Federation University, where I studied networking and information
+            security. I am now looking to move into a dedicated security role.
+          </p>
+        </div>
+
+        <aside class="about__side">
+          <div class="stat" data-count="35" data-suffix="">
+            <span class="stat__num">0</span>
+            <span class="stat__label">Incidents a day at peak</span>
+          </div>
+          <div class="stat" data-count="400" data-suffix="+">
+            <span class="stat__num">0</span>
+            <span class="stat__label">Users onboarded at ATMC</span>
+          </div>
+          <div class="stat" data-count="24" data-suffix="/7">
+            <span class="stat__num">0</span>
+            <span class="stat__label">Operation, rostered shifts</span>
+          </div>
+          <div class="stat" data-count="2" data-suffix=" yrs">
+            <span class="stat__num">0</span>
+            <span class="stat__label">In enterprise operations</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONSOLE (signature) ============ -->
+  <section class="section section--tint" id="console">
+    <div class="wrap">
+      <p class="label">02 — Interactive</p>
+      <h2 class="h2">Triage console</h2>
+      <p class="section__lede">
+        Type <code>help</code> for the list of commands, or select one below.
+      </p>
+
+      <div class="term" id="term">
+        <div class="term__bar">
+          <span class="term__lights" aria-hidden="true">
+            <i></i><i></i><i></i>
+          </span>
+          <span class="term__title">roshan@melbourne — triage</span>
+          <span class="term__status" id="termClock">--:--:--</span>
+        </div>
+
+        <div class="term__body" id="termBody" role="log" aria-live="polite" aria-label="Console output"></div>
+
+        <div class="term__prompt">
+          <label class="sr-only" for="termInput">Type a command</label>
+          <span class="term__sigil" aria-hidden="true">&rsaquo;</span>
+          <input id="termInput" type="text" autocomplete="off" spellcheck="false"
+                 placeholder="type help and press enter">
+        </div>
+      </div>
+
+      <div class="chips" id="chips">
+        <button class="chip" data-cmd="whoami">whoami</button>
+        <button class="chip" data-cmd="skills">skills</button>
+        <button class="chip" data-cmd="experience">experience</button>
+        <button class="chip" data-cmd="education">education</button>
+        <button class="chip" data-cmd="scan">scan</button>
+        <button class="chip" data-cmd="contact">contact</button>
+        <button class="chip" data-cmd="clear">clear</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EXPERIENCE ============ -->
+  <section class="section" id="work">
+    <div class="wrap">
+      <p class="label">03 — Experience</p>
+      <h2 class="h2">Experience</h2>
+
+      <ol class="timeline">
+        <li class="tl" data-reveal>
+          <div class="tl__meta">
+            <span class="tl__date">Nov 2023 — present</span>
+            <span class="tl__tag">Current</span>
+          </div>
+          <div class="tl__body">
+            <h3 class="tl__role">IT Operations Analyst</h3>
+            <p class="tl__org">Crown Melbourne</p>
+            <p class="tl__desc">
+              Level 2 support across gaming, hospitality and corporate systems,
+              owning incidents from triage through investigation, escalation and
+              resolution in a regulated, high-availability environment.
+            </p>
+            <ul class="tl__list">
+              <li>Resolve 20–35 ServiceNow tickets a day against agreed SLAs.</li>
+              <li>Review firewall rules, traffic and web filtering in Check Point SmartConsole and Forcepoint.</li>
+              <li>Manage device authentication and endpoint whitelisting through Aruba ClearPass.</li>
+              <li>Administer Azure, Intune, Exchange Admin Center, AVD and Active Directory.</li>
+              <li>Maintain Confluence documentation and compliance checklists.</li>
+            </ul>
+            <p class="tl__stack">
+              <span>ServiceNow</span><span>Check Point</span><span>Forcepoint</span>
+              <span>ClearPass</span><span>SecureCRT</span><span>Azure</span>
+              <span>Intune</span><span>Active Directory</span>
+            </p>
+          </div>
+        </li>
+
+        <li class="tl" data-reveal>
+          <div class="tl__meta">
+            <span class="tl__date">May 2023 — Oct 2023</span>
+            <span class="tl__tag tl__tag--quiet">Internship</span>
+          </div>
+          <div class="tl__body">
+            <h3 class="tl__role">IT Support Intern</h3>
+            <p class="tl__org">Australian Technical and Management College</p>
+            <p class="tl__desc">
+              Front-line support for classrooms, labs and offices across a busy
+              campus, triaging by urgency and impact.
+            </p>
+            <ul class="tl__list">
+              <li>Handled hundreds of requests a week through Ninja RMM, Outlook and Teams.</li>
+              <li>Onboarded 400+ students and staff — accounts, access and software deployment.</li>
+              <li>Kept support, resolution and inventory records audit-ready.</li>
+            </ul>
+            <p class="tl__stack">
+              <span>Ninja RMM</span><span>Active Directory</span><span>Microsoft 365</span>
+            </p>
+          </div>
+        </li>
+
+        <li class="tl" data-reveal>
+          <div class="tl__meta">
+            <span class="tl__date">Nov 2019 — Oct 2022</span>
+            <span class="tl__tag tl__tag--quiet">Study</span>
+          </div>
+          <div class="tl__body">
+            <h3 class="tl__role">Bachelor of Information Technology</h3>
+            <p class="tl__org">Federation University Australia</p>
+            <p class="tl__desc">
+              Networking and information security, cloud computing, systems
+              analysis, web development and object-oriented programming.
+            </p>
+            <ul class="tl__list">
+              <li>Led a team building a barcode-scanning retail prototype — judged best of seven in the cohort.</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ SKILLS ============ -->
+  <section class="section section--tint" id="skills">
+    <div class="wrap">
+      <p class="label">04 — Capabilities</p>
+      <h2 class="h2">Capabilities</h2>
+      <p class="section__lede">
+        Tools used in production environments. Filter by area.
+      </p>
+
+      <div class="filters" role="group" aria-label="Filter capabilities">
+        <button class="filter is-on" data-filter="all">All</button>
+        <button class="filter" data-filter="sec">Security &amp; network</button>
+        <button class="filter" data-filter="cloud">Cloud &amp; identity</button>
+        <button class="filter" data-filter="ops">Operations</button>
+        <button class="filter" data-filter="dev">Code</button>
+      </div>
+
+      <div class="grid" id="skillGrid">
+        <article class="card" data-cat="sec">
+          <h3>Check Point SmartConsole</h3>
+          <p>Firewall rule, traffic and policy review.</p>
+        </article>
+        <article class="card" data-cat="sec">
+          <h3>Forcepoint</h3>
+          <p>Web and content filtering.</p>
+        </article>
+        <article class="card" data-cat="sec">
+          <h3>Aruba ClearPass</h3>
+          <p>Device authentication and endpoint whitelisting.</p>
+        </article>
+        <article class="card" data-cat="sec">
+          <h3>SecureCRT</h3>
+          <p>Switch port configuration and connectivity investigation.</p>
+        </article>
+        <article class="card" data-cat="sec">
+          <h3>Cisco Call Manager</h3>
+          <p>IP telephony across multiple clusters.</p>
+        </article>
+        <article class="card" data-cat="cloud">
+          <h3>Microsoft Azure</h3>
+          <p>Cloud resources, virtual desktop and remote access.</p>
+        </article>
+        <article class="card" data-cat="cloud">
+          <h3>Active Directory</h3>
+          <p>Accounts, groups and access provisioning.</p>
+        </article>
+        <article class="card" data-cat="cloud">
+          <h3>Intune &amp; Workspace ONE</h3>
+          <p>Endpoint enrolment and device compliance.</p>
+        </article>
+        <article class="card" data-cat="cloud">
+          <h3>Exchange Admin Center</h3>
+          <p>Mailbox access, permissions and mail flow.</p>
+        </article>
+        <article class="card" data-cat="ops">
+          <h3>ServiceNow</h3>
+          <p>Incident and request management.</p>
+        </article>
+        <article class="card" data-cat="ops">
+          <h3>Confluence</h3>
+          <p>Technical documentation and knowledge articles.</p>
+        </article>
+        <article class="card" data-cat="ops">
+          <h3>Ninja RMM &amp; Auvik</h3>
+          <p>Remote monitoring and network visibility.</p>
+        </article>
+        <article class="card" data-cat="ops">
+          <h3>Windows, macOS, Linux</h3>
+          <p>Support across all three, including Ubuntu and Kali.</p>
+        </article>
+        <article class="card" data-cat="dev">
+          <h3>Python</h3>
+          <p>Scripting and automation for reporting tasks.</p>
+        </article>
+        <article class="card" data-cat="dev">
+          <h3>HTML, CSS, JavaScript</h3>
+          <p>Front-end fundamentals, including this site.</p>
+        </article>
+        <article class="card" data-cat="dev">
+          <h3>Git &amp; GitHub</h3>
+          <p>Version control for scripts and projects.</p>
+        </article>
+      </div>
+
+      <p class="grid__empty" id="gridEmpty" hidden>Nothing in that category yet.</p>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="section" id="contact">
+    <div class="wrap wrap--narrow">
+      <p class="label">05 — Contact</p>
+      <h2 class="h2">Get in touch</h2>
+      <p class="section__lede">
+        Open to cybersecurity and security operations roles in Melbourne,
+        including shift-based work.
+      </p>
+
+      <div class="contact">
+        <button class="copy" id="copyMail" data-mail="Rsondhtl.50@gmail.com">
+          <span class="copy__label">Email</span>
+          <span class="copy__value">Rsondhtl.50@gmail.com</span>
+          <span class="copy__hint" aria-hidden="true">Click to copy</span>
+        </button>
+
+        <div class="contact__links">
+          <a class="link" href="mailto:Rsondhtl.50@gmail.com">Send an email</a>
+          <a class="link" href="https://www.linkedin.com/in/roshan-dhital/" target="_blank" rel="noopener">LinkedIn</a>
+          <a class="link" href="https://github.com/roshandhital" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__inner">
+    <p>© <span id="year">2026</span> Roshan Dhital — Melbourne, Australia</p>
+    <p class="foot__note">Built with HTML, CSS and JavaScript.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<button class="totop" id="toTop" aria-label="Back to top">↑</button>
+
+<script src="script.js"></script>
+</body>
 </html>
