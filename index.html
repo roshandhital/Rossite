@@ -3,384 +3,247 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Roshan Dhital — tech trivia, quizzes and a CV at the bottom</title>
-<meta name="description" content="Roshan Dhital in Melbourne. Everyday technology facts you probably didn't know, a quiz, and the CV bit if you scroll far enough.">
-<meta property="og:title" content="Roshan Dhital — tech trivia and quizzes">
-<meta property="og:description" content="Why is it called Bluetooth? What was the first webcam pointed at? Find out.">
+<title>Roshan Dhital — IT Operations Analyst, Melbourne</title>
+<meta name="description" content="Roshan Dhital — IT Operations Analyst based in Melbourne, Australia. Enterprise support, networks and systems.">
+<meta name="theme-color" content="#08080B">
+
+<meta property="og:title" content="Roshan Dhital — IT Operations Analyst">
+<meta property="og:description" content="IT Operations Analyst based in Melbourne, Australia.">
 <meta property="og:type" content="website">
 
-<link rel="icon" href="favicon.ico">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<script>document.documentElement.classList.add('js');</script>
 </head>
 
 <body>
+
+<!-- ============ LOADER ============ -->
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="loader__inner">
+    <span class="loader__name">ROSHAN DHITAL</span>
+    <span class="loader__num" id="loaderNum">0</span>
+    <span class="loader__bar"><i id="loaderBar"></i></span>
+  </div>
+</div>
+
 <a class="skip" href="#main">Skip to content</a>
-<div class="progress" aria-hidden="true"><span></span></div>
+<div class="scrollbar" aria-hidden="true"><span></span></div>
+
+<div class="cursor" id="cursor" aria-hidden="true">
+  <span class="cursor__d"></span><span class="cursor__r"></span>
+</div>
+
+<!-- ============ AURORA BACKDROP ============ -->
+<div class="aurora" aria-hidden="true">
+  <i class="au au--1"></i><i class="au au--2"></i><i class="au au--3"></i>
+  <div class="grain"></div>
+</div>
 
 <header class="nav" id="nav">
-  <a class="brand" href="#top">
-    <span class="brand__badge">RD</span>
-    <span class="brand__name">Roshan</span>
-  </a>
+  <a class="nav__logo" href="#top" data-magnet>RD<i></i></a>
   <nav aria-label="Sections">
     <ul>
-      <li><a href="#facts" data-nav>Did you know</a></li>
-      <li><a href="#quiz" data-nav>The quiz</a></li>
-      <li><a href="#qna" data-nav>Q&amp;A</a></li>
-      <li><a href="#serious" data-nav>The CV bit</a></li>
+      <li><a href="#about" data-nav>About</a></li>
+      <li><a href="#work" data-nav>Work</a></li>
+      <li><a href="#skills" data-nav>Skills</a></li>
+      <li><a href="#contact" data-nav>Contact</a></li>
     </ul>
   </nav>
-  <button class="burger" id="burger" aria-expanded="false" aria-controls="nav">
-    <span class="sr-only">Menu</span><span aria-hidden="true"></span>
+  <button class="menu" id="menu" aria-expanded="false" aria-controls="nav">
+    <span class="sr-only">Menu</span><i aria-hidden="true"></i>
   </button>
 </header>
 
 <main id="main">
 
-  <!-- ================= HERO ================= -->
+  <!-- ============ HERO ============ -->
   <section class="hero" id="top">
-    <div class="hero__blobs" aria-hidden="true">
-      <i class="b b1"></i><i class="b b2"></i><i class="b b3"></i>
+    <div class="hero__text">
+      <p class="tag" data-anim="fade"><i class="live"></i> Melbourne, Australia</p>
+
+      <h1 class="hero__h1">
+        <span class="mask"><span class="mask__i">Roshan</span></span>
+        <span class="mask"><span class="mask__i grad">Dhital</span></span>
+      </h1>
+
+      <p class="hero__role" data-anim="fade">
+        <span data-scramble="IT Operations Analyst">IT Operations Analyst</span>
+      </p>
+
+      <p class="hero__line" data-anim="fade">
+        I keep enterprise systems running — networks, access, endpoints and the
+        occasional emergency. Based in Melbourne, working across gaming,
+        hospitality and corporate environments.
+      </p>
+
+      <div class="hero__btns" data-anim="fade">
+        <a class="btn" href="#contact" data-magnet><span>Get in touch</span></a>
+        <a class="btn btn--line" href="#work" data-magnet><span>See my work</span></a>
+      </div>
     </div>
 
-    <div class="hero__grid">
-      <div class="hero__copy">
-        <p class="kicker"><span class="dot"></span> Melbourne, Australia</p>
-        <h1 class="hero__h1">
-          <span class="word">Everyday</span>
-          <span class="word">tech is</span>
-          <span class="word hi">weirder<span class="squiggle" aria-hidden="true"></span></span>
-          <span class="word">than you think</span>
-        </h1>
-        <p class="hero__sub">
-          I'm Roshan. I work in IT, which mostly means people ask me why the
-          printer hates them. Along the way I collect the strange little
-          stories behind things we all use daily. Scroll down — there's a quiz.
-        </p>
-        <div class="hero__cta">
-          <a class="btn btn--pop" href="#quiz">Take the quiz →</a>
-          <a class="btn btn--plain" href="#serious">Just show me the CV</a>
+    <!-- 3D rotating cube -->
+    <div class="scene" aria-hidden="true">
+      <div class="cube" id="cube">
+        <span class="face f-front">SUPPORT</span>
+        <span class="face f-back">NETWORKS</span>
+        <span class="face f-right">CLOUD</span>
+        <span class="face f-left">SYSTEMS</span>
+        <span class="face f-top">RD</span>
+        <span class="face f-bottom">2026</span>
+      </div>
+      <div class="scene__glow"></div>
+    </div>
+
+    <div class="scrolldown" aria-hidden="true"><span></span>SCROLL</div>
+  </section>
+
+  <!-- ============ MARQUEE ============ -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__t" id="marquee"></div>
+  </div>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="sec" id="about">
+    <div class="wrap">
+      <p class="lbl" data-anim="fade">01 / About</p>
+      <h2 class="h2" data-anim="lines">
+        Two years keeping<br>things running.
+      </h2>
+
+      <div class="about">
+        <div class="about__txt">
+          <p data-anim="fade">
+            I'm an IT Operations Analyst at Crown Melbourne, handling Level 2
+            incidents across a 24/7 environment. Before that I interned at
+            Australian Technical and Management College, and I hold a Bachelor
+            of Information Technology from Federation University.
+          </p>
+          <p data-anim="fade">
+            I like the part of the job where something looks broken for one
+            reason and turns out to be broken for another. Calm under pressure,
+            careful with documentation, and reasonable company on a night shift.
+          </p>
         </div>
-        <p class="hero__meta">
-          <span>💻 IT Operations Analyst</span>
-          <span>🎓 BIT, Federation</span>
-          <span>♟️ Enthusiastically bad at chess</span>
-        </p>
-      </div>
 
-      <!-- 3D tilting stack -->
-      <div class="stack" id="stack" aria-hidden="true">
-        <div class="stack__card sc1"><span>1 ton</span><small>weight of the first hard drive</small></div>
-        <div class="stack__card sc2"><span>☕</span><small>what the first webcam watched</small></div>
-        <div class="stack__card sc3"><span>Nothing</span><small>what "Wi-Fi" stands for</small></div>
-      </div>
-    </div>
-
-    <div class="ticker" aria-hidden="true">
-      <div class="ticker__row" id="tickerRow"></div>
-    </div>
-  </section>
-
-  <!-- ================= DID YOU KNOW ================= -->
-  <section class="band band--cream" id="facts">
-    <div class="wrap">
-      <p class="eyebrow">Do you know?</p>
-      <h2 class="h2">Eight things about tech<br>you use <span class="mark">every single day</span></h2>
-      <p class="lede">
-        Click a card to flip it. None of this is complicated — it's just
-        oddly satisfying to know.
-      </p>
-
-      <div class="cards" id="factCards">
-
-        <button class="flip" data-flip>
-          <span class="flip__in">
-            <span class="flip__face flip__front" style="--c:var(--blue)">
-              <span class="flip__tag">01 · Naming</span>
-              <span class="flip__q">What does "Wi-Fi" actually stand for?</span>
-              <span class="flip__hint">Tap to reveal</span>
-            </span>
-            <span class="flip__face flip__back">
-              <span class="flip__a">Absolutely nothing</span>
-              <span class="flip__d">It's a made-up brand name, invented by a branding agency because "IEEE 802.11b Direct Sequence" was never going to catch on. "Wireless Fidelity" was invented afterwards to explain a name that already existed.</span>
-              <span class="flip__src">Coined 1999 by Interbrand</span>
-            </span>
-          </span>
-        </button>
-
-        <button class="flip" data-flip>
-          <span class="flip__in">
-            <span class="flip__face flip__front" style="--c:var(--coral)">
-              <span class="flip__tag">02 · Vikings</span>
-              <span class="flip__q">Bluetooth is named after a person. Who?</span>
-              <span class="flip__hint">Tap to reveal</span>
-            </span>
-            <span class="flip__face flip__back">
-              <span class="flip__a">A 10th-century Danish king</span>
-              <span class="flip__d">Harald "Bluetooth" Gormsson united warring Danish tribes, so engineers borrowed his name for a technology uniting different devices. The logo isn't an abstract squiggle — it's his initials written in Nordic runes, stacked together.</span>
-              <span class="flip__src">Named at Ericsson, 1990s</span>
-            </span>
-          </span>
-        </button>
-
-        <button class="flip" data-flip>
-          <span class="flip__in">
-            <span class="flip__face flip__front" style="--c:var(--violet)">
-              <span class="flip__tag">03 · Firsts</span>
-              <span class="flip__q">The world's first webcam was pointed at what?</span>
-              <span class="flip__hint">Tap to reveal</span>
-            </span>
-            <span class="flip__face flip__back">
-              <span class="flip__a">A coffee pot</span>
-              <span class="flip__d">Researchers at Cambridge were tired of walking to the break room only to find the pot empty, so they aimed a camera at it. When it went online, people all over the world spent years watching a kettle in England slowly empty.</span>
-              <span class="flip__src">Trojan Room coffee pot, Cambridge, 1991</span>
-            </span>
-          </span>
-        </button>
-
-        <button class="flip" data-flip>
-          <span class="flip__in">
-            <span class="flip__face flip__front" style="--c:var(--lime)">
-              <span class="flip__tag">04 · Bugs</span>
-              <span class="flip__q">Why do we call software errors "bugs"?</span>
-              <span class="flip__hint">Tap to reveal</span>
-            </span>
-            <span class="flip__face flip__back">
-              <span class="flip__a">There was a real moth</span>
-              <span class="flip__d">In 1947 a team including Grace Hopper found an actual moth stuck in a Harvard computer relay and taped it into the logbook. Engineers had been calling faults "bugs" since Edison's day — but that moth is the most famous insect in computing.</span>
-              <span class="flip__src">Harvard Mark II logbook, 1947</span>
-            </span>
-          </span>
-        </button>
-
-        <button class="flip" data-flip>
-          <span class="flip__in">
-            <span class="flip__face flip__front" style="--c:var(--sun)">
-              <span class="flip__tag">05 · Storage</span>
-              <span class="flip__q">How big was the first commercial hard drive?</span>
-              <span class="flip__hint">Tap to reveal</span>
-            </span>
-            <span class="flip__face flip__back">
-              <span class="flip__a">About 5 MB — and a ton</span>
-              <span class="flip__d">IBM's 1956 RAMAC held roughly one modern phone photo, weighed about as much as a small car, and had to be moved by forklift. Companies rented it by the month because nobody could afford to buy one.</span>
-              <span class="flip__src">IBM 305 RAMAC, 1956</span>
-            </span>
-          </span>
-        </button>
-
-        <button class="flip" data-flip>
-          <span class="flip__in">
-            <span class="flip__face flip__front" style="--c:var(--blue)">
-              <span class="flip__tag">06 · Companies</span>
-              <span class="flip__q">Nokia didn't start out making phones. What did it make?</span>
-              <span class="flip__hint">Tap to reveal</span>
-            </span>
-            <span class="flip__face flip__back">
-              <span class="flip__a">Paper</span>
-              <span class="flip__d">Nokia began in 1865 as a pulp mill in Finland. Over the years it also made rubber boots, car tyres, televisions and electricity cables before it ever made a phone. Google, meanwhile, was originally called BackRub.</span>
-              <span class="flip__src">Nokia founded 1865</span>
-            </span>
-          </span>
-        </button>
-
-        <button class="flip" data-flip>
-          <span class="flip__in">
-            <span class="flip__face flip__front" style="--c:var(--coral)">
-              <span class="flip__tag">07 · Order</span>
-              <span class="flip__q">Which came first — email, or the web?</span>
-              <span class="flip__hint">Tap to reveal</span>
-            </span>
-            <span class="flip__face flip__back">
-              <span class="flip__a">Email, by about 20 years</span>
-              <span class="flip__d">Networked email arrived in 1971, when Ray Tomlinson picked the @ symbol simply because it was sitting unused on the keyboard. The World Wide Web didn't appear until 1989. The internet and the web are not the same thing.</span>
-              <span class="flip__src">Email 1971 · Web proposed 1989</span>
-            </span>
-          </span>
-        </button>
-
-        <button class="flip" data-flip>
-          <span class="flip__in">
-            <span class="flip__face flip__front" style="--c:var(--violet)">
-              <span class="flip__tag">08 · Everyday</span>
-              <span class="flip__q">What is a "pixel", literally?</span>
-              <span class="flip__hint">Tap to reveal</span>
-            </span>
-            <span class="flip__face flip__back">
-              <span class="flip__a">Picture element</span>
-              <span class="flip__d">Just two words squashed together. While we're here: the save icon on your screen is a floppy disk, a physical object most people under 25 have never held, and we keep using it because everyone already knows what it means.</span>
-              <span class="flip__src">Term in use since the 1960s</span>
-            </span>
-          </span>
-        </button>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= QUIZ ================= -->
-  <section class="band band--dark" id="quiz">
-    <div class="wrap">
-      <p class="eyebrow eyebrow--light">The main event</p>
-      <h2 class="h2 h2--light">How much do you<br>actually know?</h2>
-      <p class="lede lede--light">
-        Six questions about technology you use constantly. No sign-up, no email
-        capture, no "download our whitepaper". Most people get three.
-      </p>
-
-      <div class="quiz" id="quizBox">
-        <div class="quiz__bar"><span id="quizBar"></span></div>
-        <p class="quiz__count" id="quizCount">Question 1 of 6</p>
-
-        <div id="quizSlot"></div>
-
-        <div class="quiz__done" id="quizDone" hidden>
-          <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
-          <p class="quiz__score" id="quizScore">0 / 6</p>
-          <p class="quiz__verdict" id="quizVerdict"></p>
-          <button class="btn btn--pop" id="quizReset">Go again</button>
+        <div class="nums">
+          <div class="num" data-count="35" data-suf="">
+            <b>0</b><span>tickets a day</span>
+          </div>
+          <div class="num" data-count="400" data-suf="+">
+            <b>0</b><span>users onboarded</span>
+          </div>
+          <div class="num" data-count="2" data-suf=" yrs">
+            <b>0</b><span>in operations</span>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ================= Q&A ================= -->
-  <section class="band band--cream" id="qna">
+  <!-- ============ WORK ============ -->
+  <section class="sec sec--alt" id="work">
     <div class="wrap">
-      <p class="eyebrow">Ask me anything</p>
-      <h2 class="h2">Questions I get asked,<br>answered honestly</h2>
-      <p class="lede">Click any question. Some answers are more flattering than others.</p>
+      <p class="lbl" data-anim="fade">02 / Work</p>
+      <h2 class="h2" data-anim="lines">Where I've been.</h2>
 
-      <div class="qna" id="qnaList">
-        <details class="q">
-          <summary>Why does turning it off and on again actually work?</summary>
-          <div class="q__body">
-            <p>Because software accumulates mess. Half-finished tasks, stuck connections, memory that never got handed back. Restarting throws all of it away and starts from a known state. It's not a magic trick, it's just the only guaranteed way back to a situation somebody has actually tested.</p>
+      <div class="jobs">
+        <article class="job" data-anim="row">
+          <span class="job__yr">2023 —</span>
+          <div class="job__b">
+            <h3>IT Operations Analyst</h3>
+            <p class="job__co">Crown Melbourne</p>
+            <p>Level 2 support across gaming, hospitality and corporate systems. Incidents from triage through investigation to resolution, 20–35 a day against agreed SLAs.</p>
           </div>
-        </details>
+          <span class="job__ar" aria-hidden="true">↗</span>
+        </article>
 
-        <details class="q">
-          <summary>Should I really shut down my laptop every night?</summary>
-          <div class="q__body">
-            <p>Not every night, but not never either. Sleep mode is fine day to day. The reason to restart weekly is that most updates only finish applying on a reboot — so the person who never shuts down is often the person whose machine is quietly six updates behind.</p>
+        <article class="job" data-anim="row">
+          <span class="job__yr">2023</span>
+          <div class="job__b">
+            <h3>IT Support Intern</h3>
+            <p class="job__co">Australian Technical and Management College</p>
+            <p>Front-line support for classrooms, labs and offices. Hundreds of requests a week, and onboarding for over 400 students and staff.</p>
           </div>
-        </details>
+          <span class="job__ar" aria-hidden="true">↗</span>
+        </article>
 
-        <details class="q">
-          <summary>Is my phone listening to me?</summary>
-          <div class="q__body">
-            <p>Almost certainly not in the way people mean. Constantly recording audio would demolish your battery and use noticeable data. The duller explanation is that advertising builds a startlingly good picture from what you search, where you go and who you're near. It feels like listening because the guess is so accurate.</p>
+        <article class="job" data-anim="row">
+          <span class="job__yr">2019—22</span>
+          <div class="job__b">
+            <h3>Bachelor of Information Technology</h3>
+            <p class="job__co">Federation University Australia</p>
+            <p>Networking, cloud computing, systems analysis and programming. Led a team project judged best of seven prototypes.</p>
           </div>
-        </details>
-
-        <details class="q">
-          <summary>What's the most common thing you fix?</summary>
-          <div class="q__body">
-            <p>Something being unplugged. I say that with total affection — it happens to everyone, including me, including in front of an audience. The second most common is a password with caps lock on.</p>
-          </div>
-        </details>
-
-        <details class="q">
-          <summary>Best tech advice for someone who isn't technical?</summary>
-          <div class="q__body">
-            <p>Back up your photos in two places, and turn on two-factor authentication for your email. Your email is the master key — whoever controls it can reset everything else. It's a boring answer, but I've never met anyone who regretted doing it.</p>
-          </div>
-        </details>
-
-        <details class="q">
-          <summary>Something about you that isn't technology?</summary>
-          <div class="q__body">
-            <p>I've lived on several continents and speak more than one language, which turns out to be more useful in IT than you'd expect — a lot of the job is translation of one kind or another. I swim, I go to the gym, and I play chess badly but enthusiastically.</p>
-          </div>
-        </details>
+          <span class="job__ar" aria-hidden="true">↗</span>
+        </article>
       </div>
     </div>
   </section>
 
-  <!-- ================= THE CV BIT ================= -->
-  <section class="band band--paper" id="serious">
+  <!-- ============ SKILLS ============ -->
+  <section class="sec" id="skills">
     <div class="wrap">
-      <p class="eyebrow">Right, the serious part</p>
-      <h2 class="h2">The CV bit</h2>
-      <p class="lede">For recruiters, and anyone who scrolled straight past the fun.</p>
+      <p class="lbl" data-anim="fade">03 / Skills</p>
+      <h2 class="h2" data-anim="lines">What I work with.</h2>
 
-      <div class="cvgrid">
-        <article class="job" data-tilt>
-          <p class="job__when">Nov 2023 — now</p>
-          <h3>IT Operations Analyst</h3>
-          <p class="job__org">Crown Melbourne</p>
-          <ul>
-            <li>Level 2 support across gaming, hospitality and corporate systems</li>
-            <li>Network, access and application troubleshooting across multiple sites</li>
-            <li>Azure, Intune, Exchange Admin Center, AVD, Active Directory</li>
-            <li>20–35 ServiceNow tickets a day against agreed SLAs</li>
-            <li>Documentation and compliance checklists in Confluence</li>
-          </ul>
+      <div class="tiles">
+        <article class="tile" data-tilt data-anim="pop">
+          <span class="tile__i">◈</span>
+          <h3>Support &amp; incidents</h3>
+          <p>ServiceNow, Ninja RMM, Confluence, SLA-driven triage and documentation.</p>
         </article>
-
-        <article class="job" data-tilt>
-          <p class="job__when">May 2023 — Oct 2023</p>
-          <h3>IT Support Intern</h3>
-          <p class="job__org">Australian Technical and Management College</p>
-          <ul>
-            <li>Hundreds of requests a week via Ninja RMM, Outlook and Teams</li>
-            <li>Onboarded 400+ students and staff</li>
-            <li>Kept support and inventory records audit-ready</li>
-          </ul>
+        <article class="tile" data-tilt data-anim="pop">
+          <span class="tile__i">◉</span>
+          <h3>Networks</h3>
+          <p>Switching, connectivity investigation, filtering policy and access control.</p>
         </article>
-
-        <article class="job" data-tilt>
-          <p class="job__when">2019 — 2022</p>
-          <h3>Bachelor of Information Technology</h3>
-          <p class="job__org">Federation University Australia</p>
-          <ul>
-            <li>Networking, cloud computing, systems analysis, programming</li>
-            <li>Led a team project judged best of seven prototypes</li>
-          </ul>
+        <article class="tile" data-tilt data-anim="pop">
+          <span class="tile__i">▣</span>
+          <h3>Cloud &amp; identity</h3>
+          <p>Azure, Active Directory, Intune, Exchange Admin Center, AVD.</p>
         </article>
-      </div>
-
-      <div class="tools">
-        <h3 class="tools__h">Things I use</h3>
-        <p class="tools__list">
-          <span>ServiceNow</span><span>Azure</span><span>Intune</span>
-          <span>Active Directory</span><span>Exchange</span><span>Confluence</span>
-          <span>Ninja RMM</span><span>Python</span><span>Linux</span>
-          <span>Windows</span><span>macOS</span><span>Microsoft 365</span>
-        </p>
+        <article class="tile" data-tilt data-anim="pop">
+          <span class="tile__i">⬡</span>
+          <h3>Systems &amp; code</h3>
+          <p>Windows, macOS, Linux, Python scripting and light automation.</p>
+        </article>
       </div>
     </div>
   </section>
 
-  <!-- ================= CONTACT ================= -->
-  <section class="band band--pop" id="contact">
+  <!-- ============ CONTACT ============ -->
+  <section class="sec sec--end" id="contact">
     <div class="wrap wrap--mid">
-      <h2 class="h2 h2--light">Say hello</h2>
-      <p class="lede lede--light">
-        Always happy to talk about technology, work, or an obscure fact
-        you think I should add to this page.
-      </p>
-      <button class="mail" id="copyMail" data-mail="Rsondhtl.50@gmail.com">
+      <p class="lbl" data-anim="fade">04 / Contact</p>
+      <h2 class="big" data-anim="lines">Let's talk.</h2>
+
+      <button class="mail" id="copyMail" data-mail="Rsondhtl.50@gmail.com" data-magnet>
         <span>Rsondhtl.50@gmail.com</span>
-        <small>click to copy</small>
+        <i>click to copy</i>
       </button>
-      <p class="social">
-        <a href="mailto:Rsondhtl.50@gmail.com">Email</a>
-        <a href="https://www.linkedin.com/in/roshan-dhital/" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://github.com/roshandhital" target="_blank" rel="noopener">GitHub</a>
-      </p>
+
+      <div class="links" data-anim="fade">
+        <a href="mailto:Rsondhtl.50@gmail.com" data-magnet>Email</a>
+        <a href="https://www.linkedin.com/in/roshan-dhital/" target="_blank" rel="noopener" data-magnet>LinkedIn</a>
+        <a href="https://github.com/roshandhital" target="_blank" rel="noopener" data-magnet>GitHub</a>
+      </div>
     </div>
   </section>
 </main>
 
 <footer class="foot">
-  <p>© <span id="year">2026</span> Roshan Dhital · Melbourne</p>
-  <p>Built by hand. No frameworks were harmed.</p>
+  <p>© <span id="year">2026</span> Roshan Dhital</p>
+  <p>Melbourne, Australia</p>
 </footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<button class="top" id="top-btn" aria-label="Back to top">↑</button>
 
 <script src="script.js" defer></script>
 </body>
