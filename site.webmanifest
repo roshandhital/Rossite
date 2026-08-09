@@ -1,0 +1,13 @@
+{
+  "name": "Roshan Dhital",
+  "short_name": "Roshan",
+  "description": "IT Operations Analyst based in Melbourne, Australia.",
+  "start_url": "/Rossite/",
+  "scope": "/Rossite/",
+  "display": "standalone",
+  "background_color": "#08080B",
+  "theme_color": "#08080B",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
