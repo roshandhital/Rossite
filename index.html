@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Roshan Dhital — IT Operations Analyst, Melbourne</title>
 <meta name="description" content="Roshan Dhital — IT Operations Analyst based in Melbourne, Australia. Enterprise support, networks and systems.">
-<meta name="theme-color" content="#08080B">
+<meta name="theme-color" content="#0A0E14">
 
 <meta property="og:title" content="Roshan Dhital — IT Operations Analyst">
 <meta property="og:description" content="IT Operations Analyst based in Melbourne, Australia.">
@@ -20,7 +20,7 @@
 <link rel="manifest" href="site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700;800;900&family=Sora:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <script>document.documentElement.classList.add('js');</script>
 </head>
@@ -39,15 +39,10 @@
 <a class="skip" href="#main">Skip to content</a>
 <div class="scrollbar" aria-hidden="true"><span></span></div>
 
-<div class="cursor" id="cursor" aria-hidden="true">
-  <span class="cursor__d"></span><span class="cursor__r"></span>
-</div>
+<div class="cursor" id="cursor" aria-hidden="true"><span class="cursor__r"></span></div>
 
-<!-- ============ AURORA BACKDROP ============ -->
-<div class="aurora" aria-hidden="true">
-  <i class="au au--1"></i><i class="au au--2"></i><i class="au au--3"></i>
-  <div class="grain"></div>
-</div>
+<!-- ============ BLUEPRINT BACKDROP ============ -->
+<div class="grid-bg" id="gridBg" aria-hidden="true"></div>
 
 <header class="nav" id="nav">
   <a class="nav__logo" href="#top" data-magnet>RD<i></i></a>
@@ -92,20 +87,47 @@
       </div>
     </div>
 
-    <!-- 3D node sphere — canvas, math-driven, no WebGL dependency -->
-    <div class="scene" aria-hidden="true">
-      <canvas class="sphere" id="sphere"></canvas>
-      <div class="scene__glow"></div>
-      <div class="scene__ring scene__ring--a"></div>
-      <div class="scene__ring scene__ring--b"></div>
+    <!-- interactive die -->
+    <div class="rig" data-anim="fade">
+      <p class="rig__hint" id="dieHint">Click the die, or press Enter</p>
+
+      <div class="rig__stage" id="dieStage">
+        <div class="rig__glow" aria-hidden="true"></div>
+        <div class="rig__pad" aria-hidden="true"></div>
+
+        <div class="die" id="die" role="button" tabindex="0"
+             aria-label="Roll the die to reveal a random part of what I do">
+          <span class="f f1"><i class="pip" style="grid-area:2/2"></i></span>
+          <span class="f f2">
+            <i class="pip" style="grid-area:1/1"></i><i class="pip" style="grid-area:3/3"></i>
+          </span>
+          <span class="f f3">
+            <i class="pip" style="grid-area:1/1"></i><i class="pip" style="grid-area:2/2"></i><i class="pip" style="grid-area:3/3"></i>
+          </span>
+          <span class="f f4">
+            <i class="pip" style="grid-area:1/1"></i><i class="pip" style="grid-area:1/3"></i>
+            <i class="pip" style="grid-area:3/1"></i><i class="pip" style="grid-area:3/3"></i>
+          </span>
+          <span class="f f5">
+            <i class="pip" style="grid-area:1/1"></i><i class="pip" style="grid-area:1/3"></i>
+            <i class="pip" style="grid-area:2/2"></i>
+            <i class="pip" style="grid-area:3/1"></i><i class="pip" style="grid-area:3/3"></i>
+          </span>
+          <span class="f f6">
+            <i class="pip" style="grid-area:1/1"></i><i class="pip" style="grid-area:2/1"></i><i class="pip" style="grid-area:3/1"></i>
+            <i class="pip" style="grid-area:1/3"></i><i class="pip" style="grid-area:2/3"></i><i class="pip" style="grid-area:3/3"></i>
+          </span>
+        </div>
+      </div>
+
+      <p class="rig__result" id="dieResult" aria-live="polite">Six sides. One of them is you finding this.</p>
+      <button class="rig__again" id="dieRoll" data-magnet type="button">Roll again</button>
     </div>
 
     <div class="scrolldown" aria-hidden="true"><span></span>SCROLL</div>
   </section>
 
-  <svg class="div div--1" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0,60 C300,10 900,10 1200,60 L1200,0 L0,0 Z"/>
-  </svg>
+  <div class="rule" aria-hidden="true"></div>
 
   <!-- ============ MARQUEE ============ -->
   <div class="marquee" aria-hidden="true">
@@ -115,12 +137,17 @@
   <!-- ============ ABOUT ============ -->
   <section class="sec" id="about">
     <div class="wrap">
-      <p class="lbl" data-anim="fade">01 / About</p>
+      <p class="lbl" data-anim="fade">About</p>
       <h2 class="h2" data-anim="lines">
         Two years keeping<br>things running.
       </h2>
 
       <div class="about">
+        <blockquote class="quote" data-anim="fade">
+          "The tickets I remember aren't the easy ones. They're the ones where
+          the obvious explanation turned out to be wrong."
+        </blockquote>
+
         <div class="about__txt">
           <p data-anim="fade">
             I'm an IT Operations Analyst at Crown Melbourne, handling Level 2
@@ -129,21 +156,32 @@
             of Information Technology from Federation University.
           </p>
           <p data-anim="fade">
-            I like the part of the job where something looks broken for one
-            reason and turns out to be broken for another. Calm under pressure,
-            careful with documentation, and reasonable company on a night shift.
+            Calm under pressure, careful with documentation, and reasonable
+            company on a night shift.
           </p>
         </div>
 
-        <div class="nums">
-          <div class="num" data-anim="flip" data-count="35" data-suf="">
-            <b>0</b><span>tickets a day</span>
+        <div class="rings" data-anim="fade">
+          <div class="ring" data-count="35" data-suf="">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="ring__trail" cx="60" cy="60" r="52"/>
+              <circle class="ring__bar ring__bar--a" cx="60" cy="60" r="52"/>
+            </svg>
+            <div class="ring__txt"><b>0</b><span>tickets/day</span></div>
           </div>
-          <div class="num" data-anim="flip" data-count="400" data-suf="+">
-            <b>0</b><span>users onboarded</span>
+          <div class="ring" data-count="400" data-suf="+">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="ring__trail" cx="60" cy="60" r="52"/>
+              <circle class="ring__bar ring__bar--b" cx="60" cy="60" r="52"/>
+            </svg>
+            <div class="ring__txt"><b>0</b><span>onboarded</span></div>
           </div>
-          <div class="num" data-anim="flip" data-count="2" data-suf=" yrs">
-            <b>0</b><span>in operations</span>
+          <div class="ring" data-count="2" data-suf=" yrs">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="ring__trail" cx="60" cy="60" r="52"/>
+              <circle class="ring__bar ring__bar--c" cx="60" cy="60" r="52"/>
+            </svg>
+            <div class="ring__txt"><b>0</b><span>in ops</span></div>
           </div>
         </div>
       </div>
@@ -151,78 +189,105 @@
   </section>
 
   <!-- ============ WORK ============ -->
-  <svg class="div div--2" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0,0 C300,50 900,50 1200,0 L1200,60 L0,60 Z"/>
-  </svg>
   <section class="sec sec--alt" id="work">
     <div class="wrap">
-      <p class="lbl" data-anim="fade">02 / Work</p>
+      <p class="lbl" data-anim="fade">Work</p>
       <h2 class="h2" data-anim="lines">Where I've been.</h2>
 
-      <div class="jobs">
-        <article class="job" data-anim="row">
-          <span class="job__yr">2023 —</span>
-          <div class="job__b">
-            <h3>IT Operations Analyst</h3>
-            <p class="job__co">Crown Melbourne</p>
-            <p>Level 2 support across gaming, hospitality and corporate systems. Incidents from triage through investigation to resolution, 20–35 a day against agreed SLAs.</p>
-          </div>
-          <span class="job__ar" aria-hidden="true">↗</span>
-        </article>
+      <div class="rail" id="rail">
+        <div class="rail__line"><span class="rail__dot" id="railDot"></span></div>
 
-        <article class="job" data-anim="row">
-          <span class="job__yr">2023</span>
-          <div class="job__b">
-            <h3>IT Support Intern</h3>
-            <p class="job__co">Australian Technical and Management College</p>
-            <p>Front-line support for classrooms, labs and offices. Hundreds of requests a week, and onboarding for over 400 students and staff.</p>
-          </div>
-          <span class="job__ar" aria-hidden="true">↗</span>
-        </article>
+        <div class="jobs">
+          <article class="job" data-anim="hinge">
+            <span class="job__yr">2023 —</span>
+            <div class="job__b">
+              <h3>IT Operations Analyst</h3>
+              <p class="job__co">Crown Melbourne</p>
+              <p>Level 2 support across gaming, hospitality and corporate systems. Incidents from triage through investigation to resolution, 20–35 a day against agreed SLAs.</p>
+            </div>
+          </article>
 
-        <article class="job" data-anim="row">
-          <span class="job__yr">2019—22</span>
-          <div class="job__b">
-            <h3>Bachelor of Information Technology</h3>
-            <p class="job__co">Federation University Australia</p>
-            <p>Networking, cloud computing, systems analysis and programming. Led a team project judged best of seven prototypes.</p>
-          </div>
-          <span class="job__ar" aria-hidden="true">↗</span>
-        </article>
+          <article class="job" data-anim="hinge">
+            <span class="job__yr">2023</span>
+            <div class="job__b">
+              <h3>IT Support Intern</h3>
+              <p class="job__co">Australian Technical and Management College</p>
+              <p>Front-line support for classrooms, labs and offices. Hundreds of requests a week, and onboarding for over 400 students and staff.</p>
+            </div>
+          </article>
+
+          <article class="job" data-anim="hinge">
+            <span class="job__yr">2019—22</span>
+            <div class="job__b">
+              <h3>Bachelor of Information Technology</h3>
+              <p class="job__co">Federation University Australia</p>
+              <p>Networking, cloud computing, systems analysis and programming. Led a team project judged best of seven prototypes.</p>
+            </div>
+          </article>
+        </div>
       </div>
     </div>
   </section>
 
-  <svg class="div div--3" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0,60 C300,10 900,10 1200,60 L1200,0 L0,0 Z"/>
-  </svg>
-
   <!-- ============ SKILLS ============ -->
   <section class="sec" id="skills">
     <div class="wrap">
-      <p class="lbl" data-anim="fade">03 / Skills</p>
+      <p class="lbl" data-anim="fade">Skills</p>
       <h2 class="h2" data-anim="lines">What I work with.</h2>
 
-      <div class="tiles">
+      <div class="bento">
+        <article class="tile tile--big" data-tilt data-anim="pop">
+          <div class="tile__orbit" aria-hidden="true">
+            <i></i><i></i><i></i>
+          </div>
+          <h3>Day to day</h3>
+          <p>Triage, investigate, escalate, document. Twenty to thirty-five
+             incidents a day, across enterprise, gaming and corporate systems,
+             without letting the paperwork slip.</p>
+        </article>
+
         <article class="tile" data-tilt data-anim="pop">
-          <div class="micube" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="icon icon--support" aria-hidden="true">
+            <span class="icon__ring"></span>
+            <span class="icon__ring icon__ring--d"></span>
+            <span class="icon__dot"></span>
+          </div>
           <h3>Support &amp; incidents</h3>
-          <p>ServiceNow, Ninja RMM, Confluence, SLA-driven triage and documentation.</p>
+          <p>ServiceNow, Ninja RMM, Confluence, SLA-driven triage.</p>
         </article>
         <article class="tile" data-tilt data-anim="pop">
-          <div class="micube" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <svg class="icon icon--net" viewBox="0 0 64 64" aria-hidden="true">
+            <line x1="14" y1="46" x2="32" y2="16" class="icon__line"/>
+            <line x1="32" y1="16" x2="50" y2="46" class="icon__line"/>
+            <line x1="14" y1="46" x2="50" y2="46" class="icon__line"/>
+            <circle cx="32" cy="16" r="4.5" class="icon__node"/>
+            <circle cx="14" cy="46" r="4.5" class="icon__node"/>
+            <circle cx="50" cy="46" r="4.5" class="icon__node"/>
+            <circle r="3" class="icon__packet">
+              <animateMotion dur="2.6s" repeatCount="indefinite" path="M32,16 L50,46 L14,46 Z"/>
+            </circle>
+          </svg>
           <h3>Networks</h3>
-          <p>Switching, connectivity investigation, filtering policy and access control.</p>
+          <p>Switching, connectivity, filtering policy, access control.</p>
         </article>
         <article class="tile" data-tilt data-anim="pop">
-          <div class="micube" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="icon icon--cloud" aria-hidden="true">
+            <span class="icon__cloudbody"></span>
+            <span class="icon__cloudbump icon__cloudbump--l"></span>
+            <span class="icon__cloudbump icon__cloudbump--r"></span>
+            <span class="icon__cloudpulse"></span>
+          </div>
           <h3>Cloud &amp; identity</h3>
-          <p>Azure, Active Directory, Intune, Exchange Admin Center, AVD.</p>
+          <p>Azure, Active Directory, Intune, Exchange, AVD.</p>
         </article>
         <article class="tile" data-tilt data-anim="pop">
-          <div class="micube" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="icon icon--code" aria-hidden="true">
+            <span class="icon__bracket">&lt;</span>
+            <span class="icon__cursor"></span>
+            <span class="icon__bracket">&gt;</span>
+          </div>
           <h3>Systems &amp; code</h3>
-          <p>Windows, macOS, Linux, Python scripting and light automation.</p>
+          <p>Windows, macOS, Linux, Python scripting.</p>
         </article>
       </div>
     </div>
@@ -231,7 +296,7 @@
   <!-- ============ CONTACT ============ -->
   <section class="sec sec--end" id="contact">
     <div class="wrap wrap--mid">
-      <p class="lbl" data-anim="fade">04 / Contact</p>
+      <p class="lbl" data-anim="fade">Contact</p>
       <h2 class="big" data-anim="lines">Let's talk.</h2>
 
       <button class="mail" id="copyMail" data-mail="Rsondhtl.50@gmail.com" data-magnet>
