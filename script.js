@@ -192,20 +192,126 @@
     n.addEventListener('pointerleave', function () { n.style.transform = ''; });
   });
 
-  /* ---------- 8. Cube reacts to scroll ---------- */
-  safe('cube', function () {
-    var c = $('#cube');
-    if (!c || reduced) return;
-    var ticking = false;
-    addEventListener('scroll', function () {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(function () {
-        var y = scrollY;
-        c.style.animationPlayState = y > innerHeight ? 'paused' : 'running';
-        ticking = false;
+  /* ---------- 8. Node sphere — canvas, pure math, no WebGL ---------- */
+  safe('sphere', function () {
+    var canvas = $('#sphere');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;                       /* CSS glow + rings still show */
+
+    var COLORS = ['124,92,255', '34,211,238', '125,242,176'];  /* violet, cyan, green as rgb triples */
+    var N = 70;
+    var pts = [];
+    for (var i = 0; i < N; i++) {
+      /* Fibonacci lattice — evenly spaced points on a unit sphere */
+      var y = 1 - (i / (N - 1)) * 2;
+      var r = Math.sqrt(Math.max(0, 1 - y * y));
+      var theta = i * 2.399963;             /* golden angle */
+      pts.push({
+        x: Math.cos(theta) * r, y: y, z: Math.sin(theta) * r,
+        c: COLORS[i % COLORS.length]
       });
-    }, { passive: true });
+    }
+
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = 0, h = 0, cx = 0, cy = 0, radius = 0;
+    var rotY = 0.4, rotX = 0.25;             /* current rotation */
+    var tiltX = 0, tiltY = 0;                /* cursor-driven offset, eased */
+
+    function size() {
+      var b = canvas.getBoundingClientRect();
+      w = b.width; h = b.height;
+      canvas.width = Math.max(1, Math.floor(w * dpr));
+      canvas.height = Math.max(1, Math.floor(h * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cx = w / 2; cy = h / 2; radius = Math.min(w, h) * 0.42;
+    }
+
+    canvas.addEventListener('pointermove', function (e) {
+      var b = canvas.getBoundingClientRect();
+      var px = (e.clientX - b.left) / b.width - 0.5;
+      var py = (e.clientY - b.top) / b.height - 0.5;
+      tiltX = py * 0.6; tiltY = px * 0.6;
+    });
+    canvas.addEventListener('pointerleave', function () { tiltX = 0; tiltY = 0; });
+
+    function project(p, ry, rx) {
+      /* rotate around Y then X */
+      var x1 = p.x * Math.cos(ry) - p.z * Math.sin(ry);
+      var z1 = p.x * Math.sin(ry) + p.z * Math.cos(ry);
+      var y2 = p.y * Math.cos(rx) - z1 * Math.sin(rx);
+      var z2 = p.y * Math.sin(rx) + z1 * Math.cos(rx);
+      var d = 2.6;                           /* camera distance */
+      var scale = d / (d - z2);
+      return { sx: cx + x1 * radius * scale, sy: cy + y2 * radius * scale, z: z2, s: scale };
+    }
+
+    function frame() {
+      ctx.clearRect(0, 0, w, h);
+      rotY += 0.0022; rotX = 0.22 + tiltX;
+      var ry = rotY + tiltY;
+
+      var proj = pts.map(function (p) { return project(p, ry, rotX); });
+
+      /* connective lines between near neighbours — the "constellation" */
+      for (var i = 0; i < proj.length; i++) {
+        for (var j = i + 1; j < proj.length; j++) {
+          var dx = proj[i].sx - proj[j].sx, dy = proj[i].sy - proj[j].sy;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < radius * 0.62) {
+            var avgZ = (proj[i].z + proj[j].z) / 2;
+            var op = Math.max(0, (avgZ + 1) / 2) * 0.35;
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(120,150,255,' + op.toFixed(3) + ')';
+            ctx.lineWidth = 1;
+            ctx.moveTo(proj[i].sx, proj[i].sy);
+            ctx.lineTo(proj[j].sx, proj[j].sy);
+            ctx.stroke();
+          }
+        }
+      }
+
+      /* points, back to front so near ones draw on top */
+      var order = proj.map(function (_, i) { return i; })
+                       .sort(function (a, b) { return proj[a].z - proj[b].z; });
+      order.forEach(function (i) {
+        var p = proj[i], src = pts[i];
+        var depth = (p.z + 1) / 2;          /* 0 back, 1 front */
+        var rad = 1.3 + depth * 2.4;
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(' + src.c + ',' + (0.35 + depth * 0.65).toFixed(3) + ')';
+        ctx.arc(p.sx, p.sy, rad, 0, Math.PI * 2);
+        ctx.fill();
+        if (depth > 0.82) {                  /* faint glow on the frontmost nodes */
+          ctx.beginPath();
+          ctx.fillStyle = 'rgba(' + src.c + ',.16)';
+          ctx.arc(p.sx, p.sy, rad * 3.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+    }
+
+    size();
+
+    if (reduced) { frame(); return; }        /* one static frame, no loop */
+
+    var raf = null, active = true;
+    function loop() { frame(); raf = requestAnimationFrame(loop); }
+    function play()  { if (!raf && active && !document.hidden) raf = requestAnimationFrame(loop); }
+    function pause() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+
+    play();
+
+    var rt;
+    addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(size, 180); });
+    document.addEventListener('visibilitychange', function () { document.hidden ? pause() : play(); });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        active = es[0].isIntersecting;
+        active ? play() : pause();
+      }, { threshold: 0.01 }).observe(canvas);
+    }
   });
 
   /* ---------- 9. Counters ---------- */

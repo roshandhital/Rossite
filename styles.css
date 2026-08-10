@@ -237,35 +237,61 @@ button{ font:inherit; color:inherit; background:none; border:0; }
 .btn:hover span{ color:#fff; }
 .btn--line{ background:transparent; color:var(--fg); box-shadow:inset 0 0 0 1px var(--line); }
 
-/* 3D cube */
-.scene{ position:relative; display:grid; place-items:center; height:340px; perspective:1000px; }
+/* 3D node sphere */
+.scene{ position:relative; display:grid; place-items:center; height:380px; perspective:1000px; }
 .scene__glow{
-  position:absolute; width:220px; height:220px; border-radius:50%;
-  background:radial-gradient(circle,rgba(76,125,255,.45),transparent 68%);
-  filter:blur(28px);
+  position:absolute; width:260px; height:260px; border-radius:50%;
+  background:radial-gradient(circle,rgba(76,125,255,.4),transparent 68%);
+  filter:blur(30px); pointer-events:none;
 }
-.cube{
-  position:relative; width:150px; height:150px;
+.sphere{ position:relative; width:min(360px,84vw); height:min(360px,84vw); }
+
+/* faint orbit rings behind the sphere for extra depth */
+.scene__ring{
+  position:absolute; border-radius:50%;
+  border:1px solid rgba(76,125,255,.16);
+  pointer-events:none;
+}
+.scene__ring--a{
+  width:320px; height:320px; transform:rotateX(78deg) rotateZ(0deg);
+  animation:ringspin 26s linear infinite;
+}
+.scene__ring--b{
+  width:390px; height:390px; border-color:rgba(34,211,238,.12);
+  transform:rotateX(78deg) rotateZ(45deg);
+  animation:ringspin 34s linear infinite reverse;
+}
+@keyframes ringspin{ to{ transform:rotateX(78deg) rotateZ(360deg); } }
+
+/* mini rotating cube used as a skill-tile icon */
+.micube{
+  position:relative; width:26px; height:26px; margin-bottom:1.1rem;
   transform-style:preserve-3d; will-change:transform;
-  animation:spin 22s linear infinite;
+  animation:mcspin 9s linear infinite;
+  transition:animation-duration .3s;
 }
-@keyframes spin{
-  from{ transform:rotateX(-22deg) rotateY(0deg); }
-  to  { transform:rotateX(-22deg) rotateY(360deg); }
+.tile:hover .micube{ animation-duration:2.2s; }
+.micube i{
+  position:absolute; inset:0; display:block;
+  border:1px solid rgba(76,125,255,.65);
+  background:rgba(76,125,255,.12);
 }
-.face{
-  position:absolute; inset:0; display:grid; place-items:center;
-  font-family:var(--mono); font-size:.72rem; letter-spacing:.2em;
-  color:var(--fg);
-  border:1px solid rgba(76,125,255,.55);
-  background:rgba(76,125,255,.07); backdrop-filter:blur(3px);
+.micube i:nth-child(1){ transform:translateZ(13px); }
+.micube i:nth-child(2){ transform:rotateY(180deg) translateZ(13px); }
+.micube i:nth-child(3){ transform:rotateY(90deg) translateZ(13px); background:rgba(34,211,238,.12); border-color:rgba(34,211,238,.6); }
+.micube i:nth-child(4){ transform:rotateY(-90deg) translateZ(13px); background:rgba(34,211,238,.12); border-color:rgba(34,211,238,.6); }
+.micube i:nth-child(5){ transform:rotateX(90deg) translateZ(13px); background:rgba(125,242,176,.14); border-color:rgba(125,242,176,.6); }
+.micube i:nth-child(6){ transform:rotateX(-90deg) translateZ(13px); background:rgba(125,242,176,.14); border-color:rgba(125,242,176,.6); }
+@keyframes mcspin{
+  from{ transform:rotateX(-18deg) rotateY(0deg); }
+  to  { transform:rotateX(-18deg) rotateY(360deg); }
 }
-.f-front { transform:translateZ(75px); }
-.f-back  { transform:rotateY(180deg) translateZ(75px); }
-.f-right { transform:rotateY(90deg) translateZ(75px); }
-.f-left  { transform:rotateY(-90deg) translateZ(75px); }
-.f-top   { transform:rotateX(90deg) translateZ(75px); }
-.f-bottom{ transform:rotateX(-90deg) translateZ(75px); }
+
+/* section dividers */
+.div{ display:block; width:100%; height:44px; margin:0; }
+.div--1{ fill:var(--bg-2); }
+.div--2{ fill:var(--bg-2); margin-bottom:-1px; }
+.div--3{ fill:var(--bg); margin-top:-1px; }
 
 .scrolldown{
   position:absolute; left:var(--pad); bottom:2rem;
@@ -320,11 +346,13 @@ button{ font:inherit; color:inherit; background:none; border:0; }
 .js [data-anim]{ opacity:0; }
 .js [data-anim="fade"]{ transform:translateY(24px); }
 .js [data-anim="pop"] { transform:translateY(30px) scale(.97); }
-.js [data-anim="row"] { transform:translateY(36px); }
+.js [data-anim="row"] { transform:translateY(30px) translateZ(-60px) rotateX(-8deg); transform-origin:50% 100%; }
+.js [data-anim="flip"]{ transform:rotateX(85deg) translateY(10px); transform-origin:50% 100%; }
 [data-anim].in{
   opacity:1; transform:none;
   transition:opacity .8s var(--ease), transform .9s var(--ease);
 }
+.jobs,.nums{ perspective:900px; }
 .h2 .ln,.big .ln{ display:block; overflow:hidden; }
 .h2 .ln i,.big .ln i{ display:block; font-style:normal; transform:translateY(105%); }
 [data-anim="lines"].in .ln i{ transform:none; transition:transform 1s var(--ease); }
@@ -333,6 +361,10 @@ button{ font:inherit; color:inherit; background:none; border:0; }
 .about{ display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); gap:clamp(2rem,6vw,5rem); }
 .about__txt p{ max-width:56ch; color:var(--dim); margin:0 0 1.3rem; }
 .nums{ display:grid; gap:1.6rem; align-content:start; }
+.num{
+  border-left:2px solid rgba(76,125,255,.35); padding-left:1rem;
+  will-change:transform;
+}
 .num b{
   display:block; font-family:var(--display); font-weight:800;
   font-size:clamp(2.2rem,6vw,3rem); line-height:1;
@@ -377,7 +409,6 @@ button{ font:inherit; color:inherit; background:none; border:0; }
 }
 .tile:hover{ border-color:rgba(76,125,255,.5); }
 .tile:hover::after{ opacity:1; }
-.tile__i{ display:block; font-size:1.5rem; color:var(--violet); margin-bottom:1rem; }
 .tile h3{ font-family:var(--display); font-weight:700; font-size:1.15rem; margin:0 0 .5rem; }
 .tile p{ margin:0; font-size:.9rem; color:var(--dim); line-height:1.55; }
 
@@ -468,7 +499,8 @@ button{ font:inherit; color:inherit; background:none; border:0; }
   .js [data-anim]{ opacity:1 !important; transform:none !important; }
   .mask__i{ transform:none !important; }
   .h2 .ln i,.big .ln i{ transform:none !important; }
-  .cube{ animation:none; transform:rotateX(-22deg) rotateY(-35deg); }
+  .scene__ring{ animation:none; }
+  .micube{ animation:none; }
   .au{ animation:none; }
   .grain{ display:none; }
 }

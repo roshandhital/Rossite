@@ -10,6 +10,11 @@
 <meta property="og:title" content="Roshan Dhital — IT Operations Analyst">
 <meta property="og:description" content="IT Operations Analyst based in Melbourne, Australia.">
 <meta property="og:type" content="website">
+<meta property="og:image" content="https://roshandhital.github.io/Rossite/thumbnail.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://roshandhital.github.io/Rossite/thumbnail.png">
 
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="site.webmanifest">
@@ -87,21 +92,20 @@
       </div>
     </div>
 
-    <!-- 3D rotating cube -->
+    <!-- 3D node sphere — canvas, math-driven, no WebGL dependency -->
     <div class="scene" aria-hidden="true">
-      <div class="cube" id="cube">
-        <span class="face f-front">SUPPORT</span>
-        <span class="face f-back">NETWORKS</span>
-        <span class="face f-right">CLOUD</span>
-        <span class="face f-left">SYSTEMS</span>
-        <span class="face f-top">RD</span>
-        <span class="face f-bottom">2026</span>
-      </div>
+      <canvas class="sphere" id="sphere"></canvas>
       <div class="scene__glow"></div>
+      <div class="scene__ring scene__ring--a"></div>
+      <div class="scene__ring scene__ring--b"></div>
     </div>
 
     <div class="scrolldown" aria-hidden="true"><span></span>SCROLL</div>
   </section>
+
+  <svg class="div div--1" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,60 C300,10 900,10 1200,60 L1200,0 L0,0 Z"/>
+  </svg>
 
   <!-- ============ MARQUEE ============ -->
   <div class="marquee" aria-hidden="true">
@@ -132,13 +136,13 @@
         </div>
 
         <div class="nums">
-          <div class="num" data-count="35" data-suf="">
+          <div class="num" data-anim="flip" data-count="35" data-suf="">
             <b>0</b><span>tickets a day</span>
           </div>
-          <div class="num" data-count="400" data-suf="+">
+          <div class="num" data-anim="flip" data-count="400" data-suf="+">
             <b>0</b><span>users onboarded</span>
           </div>
-          <div class="num" data-count="2" data-suf=" yrs">
+          <div class="num" data-anim="flip" data-count="2" data-suf=" yrs">
             <b>0</b><span>in operations</span>
           </div>
         </div>
@@ -147,6 +151,9 @@
   </section>
 
   <!-- ============ WORK ============ -->
+  <svg class="div div--2" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,0 C300,50 900,50 1200,0 L1200,60 L0,60 Z"/>
+  </svg>
   <section class="sec sec--alt" id="work">
     <div class="wrap">
       <p class="lbl" data-anim="fade">02 / Work</p>
@@ -186,6 +193,10 @@
     </div>
   </section>
 
+  <svg class="div div--3" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,60 C300,10 900,10 1200,60 L1200,0 L0,0 Z"/>
+  </svg>
+
   <!-- ============ SKILLS ============ -->
   <section class="sec" id="skills">
     <div class="wrap">
@@ -194,22 +205,22 @@
 
       <div class="tiles">
         <article class="tile" data-tilt data-anim="pop">
-          <span class="tile__i">◈</span>
+          <div class="micube" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
           <h3>Support &amp; incidents</h3>
           <p>ServiceNow, Ninja RMM, Confluence, SLA-driven triage and documentation.</p>
         </article>
         <article class="tile" data-tilt data-anim="pop">
-          <span class="tile__i">◉</span>
+          <div class="micube" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
           <h3>Networks</h3>
           <p>Switching, connectivity investigation, filtering policy and access control.</p>
         </article>
         <article class="tile" data-tilt data-anim="pop">
-          <span class="tile__i">▣</span>
+          <div class="micube" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
           <h3>Cloud &amp; identity</h3>
           <p>Azure, Active Directory, Intune, Exchange Admin Center, AVD.</p>
         </article>
         <article class="tile" data-tilt data-anim="pop">
-          <span class="tile__i">⬡</span>
+          <div class="micube" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
           <h3>Systems &amp; code</h3>
           <p>Windows, macOS, Linux, Python scripting and light automation.</p>
         </article>
