@@ -470,19 +470,19 @@ button{ font:inherit; color:inherit; background:none; border:0; }
 @keyframes orbitspin{ to{ transform:rotate(360deg); } }
 
 /* category icons — bigger than the old mini-cube, one motif per skill area */
-.icon{ position:relative; display:block; width:52px; height:52px; margin-bottom:1.2rem; }
+.icon{ position:relative; display:block; width:68px; height:68px; margin-bottom:1.5rem; }
 
 /* Support & incidents — a live signal: expanding rings behind a steady dot */
 .icon--support .icon__ring{
   position:absolute; inset:0; border-radius:50%;
-  border:1.5px solid var(--cobalt);
+  border:2px solid var(--cobalt);
   animation:pingring 2.2s ease-out infinite;
 }
 .icon--support .icon__ring--d{ animation-delay:1.1s; border-color:var(--cyan); }
 .icon--support .icon__dot{
-  position:absolute; top:50%; left:50%; width:14px; height:14px; margin:-7px 0 0 -7px;
+  position:absolute; top:50%; left:50%; width:18px; height:18px; margin:-9px 0 0 -9px;
   border-radius:50%; background:radial-gradient(circle at 35% 30%, var(--cyan), var(--cobalt) 75%);
-  box-shadow:0 0 12px rgba(34,211,238,.6);
+  box-shadow:0 0 16px rgba(34,211,238,.6);
 }
 @keyframes pingring{
   0%{ transform:scale(.35); opacity:0; }
@@ -500,34 +500,34 @@ button{ font:inherit; color:inherit; background:none; border:0; }
 /* Cloud & identity — a soft floating cloud with a sync pulse beneath it */
 .icon--cloud{ animation:cloudfloat 4.5s ease-in-out infinite; }
 .icon__cloudbody{
-  position:absolute; left:6px; right:6px; bottom:14px; height:20px; border-radius:12px;
+  position:absolute; left:8px; right:8px; bottom:18px; height:26px; border-radius:15px;
   background:linear-gradient(160deg,var(--panel),#D7DCE3);
 }
 .icon__cloudbump{
-  position:absolute; bottom:18px; width:22px; height:22px; border-radius:50%;
+  position:absolute; bottom:23px; width:29px; height:29px; border-radius:50%;
   background:linear-gradient(160deg,var(--panel),#D7DCE3);
 }
-.icon__cloudbump--l{ left:8px; }
-.icon__cloudbump--r{ left:24px; width:18px; height:18px; }
+.icon__cloudbump--l{ left:10px; }
+.icon__cloudbump--r{ left:31px; width:24px; height:24px; }
 .icon__cloudpulse{
-  position:absolute; left:50%; bottom:2px; width:8px; height:8px; margin-left:-4px;
+  position:absolute; left:50%; bottom:3px; width:10px; height:10px; margin-left:-5px;
   border-radius:50%; background:var(--cyan);
   animation:pingring 2s ease-out infinite;
 }
 @keyframes cloudfloat{
   0%,100%{ transform:translateY(0); }
-  50%{ transform:translateY(-5px); }
+  50%{ transform:translateY(-6px); }
 }
 .tile:hover .icon--cloud{ animation-duration:1.6s; }
 
 /* Systems & code — brackets with a blinking cursor between them */
 .icon--code{
-  display:flex; align-items:center; justify-content:center; gap:.15rem;
-  font-family:var(--mono); font-weight:700; font-size:1.7rem; color:var(--cobalt);
+  display:flex; align-items:center; justify-content:center; gap:.2rem;
+  font-family:var(--mono); font-weight:700; font-size:2.2rem; color:var(--cobalt);
 }
 .icon__bracket{ line-height:1; }
 .icon__cursor{
-  width:3px; height:1.5rem; background:var(--mint);
+  width:4px; height:2rem; background:var(--mint);
   animation:cursorblink 1s step-end infinite;
 }
 @keyframes cursorblink{ 50%{ opacity:0; } }
