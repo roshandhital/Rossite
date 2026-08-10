@@ -10,7 +10,6 @@
   var $  = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
   var lerp = function (a, b, t) { return a + (b - a) * t; };
-  var mod360 = function (v) { return ((v % 360) + 360) % 360; };
 
   /* Run a block in isolation. One broken feature must never take the page
      down with it — a failure here should cost an animation, not the content. */
@@ -222,73 +221,123 @@
     })();
   });
 
-  /* ---------- 9. Interactive die ---------- */
-  safe('die', function () {
-    var die = $('#die'), result = $('#dieResult'), rollBtn = $('#dieRoll'), hint = $('#dieHint');
-    if (!die || !result) return;
+  /* ---------- 9. Node sphere — canvas, pure math, no WebGL ---------- */
+  safe('sphere', function () {
+    var canvas = $('#sphere');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;                       /* CSS glow + rings still show */
 
-    /* Target rotation for each face to land facing the camera — the exact
-       inverse of that face's own placement transform in the CSS, so this is
-       correct regardless of which rotation-sign convention the browser uses. */
-    var TARGET = {
-      1: { x: 0,   y: 0   },
-      6: { x: 0,   y: 180 },
-      3: { x: 0,   y: 90  },
-      4: { x: 0,   y: -90 },
-      2: { x: -90, y: 0   },
-      5: { x: 90,  y: 0   }
-    };
-    var LABEL = {
-      1: 'Support — Level 2 tickets, triaged and closed.',
-      2: 'Cloud & identity — Azure, Active Directory, Intune.',
-      3: 'Networks — switching, filtering, access control.',
-      4: 'Systems — Windows, macOS, Linux, and some Python.',
-      5: 'Always-on — rostered shifts, 24/7 coverage.',
-      6: 'Six — ask me about the chess in the footer sometime.'
-    };
-
-    var curX = -18, curY = 28;   /* matches the CSS idle base, for a clean first roll */
-    var lastFace = null, rollTimer = null, busy = false;
-
-    function pickFace() {
-      var pool = [1, 2, 3, 4, 5, 6].filter(function (f) { return f !== lastFace; });
-      return pool[(Math.random() * pool.length) | 0];
+    var COLORS = ['47,111,237', '34,211,238', '110,231,183'];  /* cobalt, cyan, mint */
+    var N = 70;
+    var pts = [];
+    for (var i = 0; i < N; i++) {
+      /* Fibonacci lattice — evenly spaced points on a unit sphere */
+      var yv = 1 - (i / (N - 1)) * 2;
+      var rv = Math.sqrt(Math.max(0, 1 - yv * yv));
+      var theta = i * 2.399963;             /* golden angle */
+      pts.push({
+        x: Math.cos(theta) * rv, y: yv, z: Math.sin(theta) * rv,
+        c: COLORS[i % COLORS.length]
+      });
     }
 
-    function roll() {
-      if (busy) return;
-      busy = true;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = 0, h = 0, cx = 0, cy = 0, radius = 0;
+    var rotY = 0.4, rotX = 0.25;
+    var tiltX = 0, tiltY = 0;
 
-      var face = pickFace();
-      var t = TARGET[face];
-      var turnsX = 2 + ((Math.random() * 2) | 0);
-      var turnsY = 3 + ((Math.random() * 2) | 0);
-      var dirX = Math.random() < 0.5 ? -1 : 1;
-      var dirY = Math.random() < 0.5 ? -1 : 1;
-
-      var newX = curX + dirX * turnsX * 360 + (t.x - mod360(curX));
-      var newY = curY + dirY * turnsY * 360 + (t.y - mod360(curY));
-
-      die.classList.add('is-rolling');
-      die.style.transform = 'rotateX(' + newX + 'deg) rotateY(' + newY + 'deg)';
-      curX = newX; curY = newY; lastFace = face;
-
-      result.textContent = LABEL[face];
-      if (hint) hint.textContent = 'Click again, or press Enter';
-
-      clearTimeout(rollTimer);
-      rollTimer = setTimeout(function () {
-        die.classList.remove('is-rolling');
-        die.classList.add('is-hit');
-        setTimeout(function () { die.classList.remove('is-hit'); busy = false; }, 420);
-      }, reduced ? 60 : 1080);
+    function size() {
+      var b = canvas.getBoundingClientRect();
+      w = b.width; h = b.height;
+      canvas.width = Math.max(1, Math.floor(w * dpr));
+      canvas.height = Math.max(1, Math.floor(h * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cx = w / 2; cy = h / 2; radius = Math.min(w, h) * 0.42;
     }
 
-    die.addEventListener('click', roll);
-    die.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); roll(); }
+    canvas.addEventListener('pointermove', function (e) {
+      var b = canvas.getBoundingClientRect();
+      var px = (e.clientX - b.left) / b.width - 0.5;
+      var py = (e.clientY - b.top) / b.height - 0.5;
+      tiltX = py * 0.6; tiltY = px * 0.6;
     });
-    if (rollBtn) rollBtn.addEventListener('click', roll);
+    canvas.addEventListener('pointerleave', function () { tiltX = 0; tiltY = 0; });
+
+    function project(p, ry, rx) {
+      var x1 = p.x * Math.cos(ry) - p.z * Math.sin(ry);
+      var z1 = p.x * Math.sin(ry) + p.z * Math.cos(ry);
+      var y2 = p.y * Math.cos(rx) - z1 * Math.sin(rx);
+      var z2 = p.y * Math.sin(rx) + z1 * Math.cos(rx);
+      var d = 2.6;
+      var scale = d / (d - z2);
+      return { sx: cx + x1 * radius * scale, sy: cy + y2 * radius * scale, z: z2 };
+    }
+
+    function frame() {
+      ctx.clearRect(0, 0, w, h);
+      rotY += 0.0022; rotX = 0.22 + tiltX;
+      var ry = rotY + tiltY;
+
+      var proj = pts.map(function (p) { return project(p, ry, rotX); });
+
+      for (var i = 0; i < proj.length; i++) {
+        for (var j = i + 1; j < proj.length; j++) {
+          var dx = proj[i].sx - proj[j].sx, dy = proj[i].sy - proj[j].sy;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < radius * 0.62) {
+            var avgZ = (proj[i].z + proj[j].z) / 2;
+            var op = Math.max(0, (avgZ + 1) / 2) * 0.35;
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(90,140,255,' + op.toFixed(3) + ')';
+            ctx.lineWidth = 1;
+            ctx.moveTo(proj[i].sx, proj[i].sy);
+            ctx.lineTo(proj[j].sx, proj[j].sy);
+            ctx.stroke();
+          }
+        }
+      }
+
+      var order = proj.map(function (_, i) { return i; })
+                       .sort(function (a, b) { return proj[a].z - proj[b].z; });
+      order.forEach(function (i) {
+        var p = proj[i], src = pts[i];
+        var depth = (p.z + 1) / 2;
+        var rad = 1.3 + depth * 2.4;
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(' + src.c + ',' + (0.35 + depth * 0.65).toFixed(3) + ')';
+        ctx.arc(p.sx, p.sy, rad, 0, Math.PI * 2);
+        ctx.fill();
+        if (depth > 0.82) {
+          ctx.beginPath();
+          ctx.fillStyle = 'rgba(' + src.c + ',.16)';
+          ctx.arc(p.sx, p.sy, rad * 3.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+    }
+
+    size();
+
+    if (reduced) { frame(); return; }
+
+    var raf = null, active = true;
+    function loop() { frame(); raf = requestAnimationFrame(loop); }
+    function play()  { if (!raf && active && !document.hidden) raf = requestAnimationFrame(loop); }
+    function pause() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+
+    play();
+
+    var rt;
+    addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(size, 180); });
+    document.addEventListener('visibilitychange', function () { document.hidden ? pause() : play(); });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        active = es[0].isIntersecting;
+        active ? play() : pause();
+      }, { threshold: 0.01 }).observe(canvas);
+    }
   });
 
   /* ---------- 10. Work rail scroll progress ---------- */
