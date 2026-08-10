@@ -87,41 +87,12 @@
       </div>
     </div>
 
-    <!-- interactive die -->
-    <div class="rig" data-anim="fade">
-      <p class="rig__hint" id="dieHint">Click the die, or press Enter</p>
-
-      <div class="rig__stage" id="dieStage">
-        <div class="rig__glow" aria-hidden="true"></div>
-        <div class="rig__pad" aria-hidden="true"></div>
-
-        <div class="die" id="die" role="button" tabindex="0"
-             aria-label="Roll the die to reveal a random part of what I do">
-          <span class="f f1"><i class="pip" style="grid-area:2/2"></i></span>
-          <span class="f f2">
-            <i class="pip" style="grid-area:1/1"></i><i class="pip" style="grid-area:3/3"></i>
-          </span>
-          <span class="f f3">
-            <i class="pip" style="grid-area:1/1"></i><i class="pip" style="grid-area:2/2"></i><i class="pip" style="grid-area:3/3"></i>
-          </span>
-          <span class="f f4">
-            <i class="pip" style="grid-area:1/1"></i><i class="pip" style="grid-area:1/3"></i>
-            <i class="pip" style="grid-area:3/1"></i><i class="pip" style="grid-area:3/3"></i>
-          </span>
-          <span class="f f5">
-            <i class="pip" style="grid-area:1/1"></i><i class="pip" style="grid-area:1/3"></i>
-            <i class="pip" style="grid-area:2/2"></i>
-            <i class="pip" style="grid-area:3/1"></i><i class="pip" style="grid-area:3/3"></i>
-          </span>
-          <span class="f f6">
-            <i class="pip" style="grid-area:1/1"></i><i class="pip" style="grid-area:2/1"></i><i class="pip" style="grid-area:3/1"></i>
-            <i class="pip" style="grid-area:1/3"></i><i class="pip" style="grid-area:2/3"></i><i class="pip" style="grid-area:3/3"></i>
-          </span>
-        </div>
-      </div>
-
-      <p class="rig__result" id="dieResult" aria-live="polite">Six sides. One of them is you finding this.</p>
-      <button class="rig__again" id="dieRoll" data-magnet type="button">Roll again</button>
+    <!-- 3D node sphere -->
+    <div class="scene" aria-hidden="true">
+      <canvas class="sphere" id="sphere"></canvas>
+      <div class="scene__glow"></div>
+      <div class="scene__ring scene__ring--a"></div>
+      <div class="scene__ring scene__ring--b"></div>
     </div>
 
     <div class="scrolldown" aria-hidden="true"><span></span>SCROLL</div>
