@@ -25,6 +25,20 @@
   --pad: clamp(1.2rem, 4vw, 3.5rem);
   --ease: cubic-bezier(.22,.9,.28,1);
   --bounce: cubic-bezier(.34,1.42,.4,1);
+
+  /* section background washes — dark blue / light blue / teal-green / near-black,
+     each a soft glow over the base --bg rather than a flat color block */
+  --wash-black: radial-gradient(120% 70% at 50% -10%, rgba(20,30,55,.55), transparent 60%),
+                linear-gradient(180deg, rgba(8,10,16,1), rgba(6,8,13,1));
+  --wash-blue:  radial-gradient(90% 60% at 18% 0%, rgba(24,46,96,.6), transparent 65%),
+                radial-gradient(70% 55% at 92% 100%, rgba(16,30,64,.45), transparent 60%),
+                var(--bg);
+  --wash-blue-light: radial-gradient(90% 65% at 82% 0%, rgba(38,88,176,.42), transparent 65%),
+                radial-gradient(75% 55% at 8% 100%, rgba(24,60,124,.32), transparent 60%),
+                var(--bg);
+  --wash-teal:  radial-gradient(90% 60% at 22% 0%, rgba(20,84,76,.4), transparent 65%),
+                radial-gradient(70% 55% at 88% 100%, rgba(16,72,68,.3), transparent 60%),
+                var(--bg);
 }
 
 *,*::before,*::after{ box-sizing:border-box; }
@@ -176,6 +190,7 @@ button{ font:inherit; color:inherit; background:none; border:0; }
   display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);
   align-items:center; gap:2rem;
   padding:8rem var(--pad) 4rem; max-width:var(--wrap); margin:0 auto;
+  background-image:var(--wash-black);
 }
 
 .tag{
@@ -293,8 +308,13 @@ button{ font:inherit; color:inherit; background:none; border:0; }
    Sections
    ========================================================= */
 .sec{ position:relative; z-index:1; padding:clamp(5rem,11vw,9rem) var(--pad); }
-.sec--alt{ background:rgba(16,21,29,.55); border-block:1px solid var(--line); }
+.sec--alt{ border-block:1px solid var(--line); }
 .sec--end{ text-align:center; }
+
+#about{ background-image:var(--wash-blue); }
+#work{ background-image:var(--wash-blue-light); }
+#skills{ background-image:var(--wash-teal); }
+#contact{ background-image:var(--wash-black); }
 
 .lbl{
   font-family:var(--mono); font-size:.72rem; letter-spacing:.28em;
